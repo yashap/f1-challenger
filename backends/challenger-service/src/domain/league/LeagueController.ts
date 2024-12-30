@@ -27,14 +27,14 @@ export class LeagueController extends BaseController {
       const { adminUserId } = query
       const pagination: ListLeaguePagination = parsePagination(query, parseLeagueOrdering)
       const { where, orderBy, limit } = buildPaginationQuery(leagueTable, pagination)
-      const parkingSpots = await this.db.db().query.leagueTable.findMany({
+      const leagues = await this.db.db().query.leagueTable.findMany({
         where: and(adminUserId ? eq(leagueTable.adminUserId, adminUserId) : undefined, where),
         orderBy,
         limit,
       })
       return {
         status: HttpStatus.OK,
-        body: buildPaginatedResponse(parkingSpots.map(leagueToDto), pagination),
+        body: buildPaginatedResponse(leagues.map(leagueToDto), pagination),
       }
     })
   }
@@ -95,9 +95,9 @@ export class LeagueController extends BaseController {
     })
   }
 
-  private async getAndVerifyOwnership(parkingSpotId: string, userId: string): Promise<League> {
+  private async getAndVerifyOwnership(leagueId: string, userId: string): Promise<League> {
     const maybeLeague = await this.db.db().query.leagueTable.findFirst({
-      where: eq(leagueTable.id, parkingSpotId),
+      where: eq(leagueTable.id, leagueId),
     })
     const league = this.getEntityOrNotFound(maybeLeague)
     if (league.adminUserId !== userId) {
