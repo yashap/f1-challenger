@@ -21,7 +21,7 @@ Install the following:
 - [cmake](https://cmake.org/)
   - On a Mac, `brew install cmake`
 
-After this, you can try running `yarn build-migrate && yarn format && yarn lint && yarn test && yarn db:restore-fixtures` to ensure everything works, before proceeding to `Dev Workflows` (below).
+After this, you can try running `yarn build-migrate && yarn format && yarn lint && yarn test` to ensure everything works, before proceeding to `Dev Workflows` (below).
 
 ## Dev Workflows
 
