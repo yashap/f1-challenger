@@ -1,0 +1,13 @@
+{
+  "name": "@f1-challenger/supertokens",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "db:clean": "yarn db:up && docker rm -f f1_supertokens && ../../tools/scripts/drop_db.sh supertokens f1_challenger_postgres_dev && ../../tools/scripts/drop_user.sh supertokens f1_challenger_postgres_dev",
+    "db:dump-fixtures": "../../tools/scripts/dump_fixtures.sh supertokens",
+    "db:migrate-up": "yarn db:up",
+    "db:up": "../../tools/scripts/ensure_postgres_db.sh -d supertokens && ../../tools/scripts/ensure_postgres_user.sh -u supertokens -w supertokens_password -d supertokens",
+    "db:restore-fixtures": "yarn db:clean && yarn db:up && ../../tools/scripts/restore_fixtures.sh supertokens postgres://supertokens:supertokens_password@localhost:5432/supertokens?sslmode=disable && yarn db:migrate-up",
+    "serve": "docker rm -f f1_supertokens && docker run --name f1_supertokens -e POSTGRESQL_USER=\"supertokens\" -e POSTGRESQL_PASSWORD=\"supertokens_password\" -e POSTGRESQL_HOST=\"host.docker.internal\" -e POSTGRESQL_PORT=\"5440\" -e LOG_LEVEL=\"${LOG_LEVEL:-WARN}\" -p 3567:3567 --rm registry.supertokens.io/supertokens/supertokens-postgresql:9.2"
+  }
+}

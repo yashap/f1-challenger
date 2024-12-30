@@ -1,0 +1,41 @@
+{
+  "name": "f1-challenger",
+  "version": "0.0.1",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "backends/*",
+      "frontends/*",
+      "packages/*"
+    ]
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "build:force": "turbo run build --force",
+    "build-migrate": "yarn install && yarn db:migrate-up && yarn db:migrate-up:test && yarn build",
+    "clean": "yarn db:clean && turbo run clean && rm -rf node_modules/",
+    "db:clean": "docker rm -f -v f1_challenger_postgres_dev f1_challenger_postgres_test && docker volume rm -f f1_challenger_postgres_data_dev f1_challenger_postgres_data_test",
+    "db:dump-fixtures": "turbo run db:dump-fixtures",
+    "db:migrate-up": "yarn db:up && turbo run db:migrate-up",
+    "db:migrate-up:test": "yarn db:up:test && turbo run db:migrate-up:test",
+    "db:up": "./tools/scripts/ensure_postgres_up.sh",
+    "db:up:test": "./tools/scripts/ensure_postgres_up.sh -p 5441 -c f1_challenger_postgres_test -v f1_challenger_postgres_data_test",
+    "db:restore-fixtures": "turbo run db:restore-fixtures",
+    "email": "open http://127.0.0.1:4436",
+    "format": "prettier --write \"**/*.{ts,tsx,md,js,jsx,json}\" && turbo run format",
+    "lint": "prettier --check \"**/*.{ts,tsx,md,js,jsx,json}\" && turbo run lint --force",
+    "serve:backend": "turbo run serve --filter='./backends/*' --parallel",
+    "serve:frontend": "yarn workspace @f1-challenger/challenger-web serve",
+    "test": "turbo run test",
+    "test:force": "turbo run test --force",
+    "test:watch": "turbo run test:watch"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "turbo": "2.0.14"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "packageManager": "yarn@1.22.22"
+}

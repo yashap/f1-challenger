@@ -1,0 +1,40 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "globalEnv": ["NODE_ENV", "LOG_LEVEL", "JSON_LOGS", "DATABASE_URL", "PORT", "HOST_NAME", "SUPERTOKENS_CORE_URL"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "clean": {
+      "cache": false
+    },
+    "db:dump-fixtures": {
+      "cache": false
+    },
+    "db:migrate-up": {
+      "cache": false
+    },
+    "db:migrate-up:test": {
+      "cache": false
+    },
+    "db:restore-fixtures": {
+      "cache": false
+    },
+    "format": {
+      "outputs": []
+    },
+    "lint": {
+      "outputs": []
+    },
+    "serve": {
+      "cache": false
+    },
+    "test": {
+      "outputs": []
+    },
+    "test:watch": {
+      "cache": false
+    }
+  }
+}
