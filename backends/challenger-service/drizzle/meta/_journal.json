@@ -12,8 +12,15 @@
     {
       "idx": 1,
       "version": "7",
-      "when": 1735453341807,
-      "tag": "0001_create_initial_table",
+      "when": 1735591064047,
+      "tag": "0001_create_league_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1735591104750,
+      "tag": "0002_add_allowed_league_statuses",
       "breakpoints": true
     }
   ]
