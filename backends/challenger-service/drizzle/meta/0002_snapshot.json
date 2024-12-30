@@ -1,6 +1,6 @@
 {
-  "id": "cd19cf45-004e-4c43-8d5d-56deabfc0423",
-  "prevId": "8b2f0287-f4c8-45bd-b23a-f9a3a54169eb",
+  "id": "1495a6ad-06aa-4dcd-ab92-5deffe9ab4f6",
+  "prevId": "cd19cf45-004e-4c43-8d5d-56deabfc0423",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -84,20 +84,20 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "League_status_values_League_status_status_fk": {
           "name": "League_status_values_League_status_status_fk",
           "tableFrom": "League",
-          "tableTo": "values_League_status",
           "columnsFrom": ["status"],
+          "tableTo": "values_League_status",
           "columnsTo": ["status"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -109,10 +109,10 @@
   },
   "enums": {},
   "schemas": {},
+  "views": {},
   "sequences": {},
   "roles": {},
   "policies": {},
-  "views": {},
   "_meta": {
     "columns": {},
     "schemas": {},

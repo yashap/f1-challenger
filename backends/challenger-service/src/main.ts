@@ -8,11 +8,11 @@ import { NestAppBuilder, NestAppRunner } from '@f1-challenger/nest-utils'
 import supertokens from 'supertokens-node'
 import { AuthModule, SuperTokensExceptionFilter } from 'src/auth'
 import { config } from 'src/config'
-import { ParkingSpotModule } from 'src/domain/parkingSpot'
+import { LeagueModule } from 'src/domain/league'
 import { Logger } from '@f1-challenger/logging'
 
 @Module({
-  imports: [ParkingSpotModule, AuthModule.forRoot(config.auth)],
+  imports: [LeagueModule, AuthModule.forRoot(config.auth)],
 })
 class AppModule {}
 

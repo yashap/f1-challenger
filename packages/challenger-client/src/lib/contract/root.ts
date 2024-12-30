@@ -1,11 +1,11 @@
 import { initContract } from '@ts-rest/core'
-import { parkingSpotContract } from './parkingSpot'
+import { leagueContract } from './league'
 
 const c = initContract()
 
 export const contract = c.router(
   {
-    parkingSpots: parkingSpotContract,
+    leagues: leagueContract,
   },
   {
     strictStatusCodes: true,
