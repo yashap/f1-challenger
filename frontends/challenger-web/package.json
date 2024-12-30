@@ -1,17 +1,22 @@
 {
-  "name": "@f1-app/challenger-web",
+  "name": "@f1-challenger/challenger-web",
   "version": "0.0.1",
   "private": true,
-  "main": "index.js",
+  "source": "src/index.html",
+  "scripts": {
+    "serve": "parcel --open",
+    "build": "parcel build --no-source-maps"
+  },
+  "dependencies": {
+    "@f1-challenger/errors": "*",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
   "devDependencies": {
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "parcel": "^2.13.3",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17"
-  },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
   }
 }
