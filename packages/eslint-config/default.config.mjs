@@ -1,5 +1,6 @@
 // @ts-check
 import eslint from '@eslint/js'
+import stylistic from '@stylistic/eslint-plugin'
 import tseslint from 'typescript-eslint'
 import eslintConfigPrettier from 'eslint-config-prettier'
 import { flatConfigs as importPlugin } from 'eslint-plugin-import'
@@ -12,6 +13,10 @@ export default tseslint.config(
   importPlugin.recommended,
   eslintConfigPrettier,
   {
+    plugins: {
+      '@stylistic': stylistic
+    },
+
     languageOptions: {
       parser,
       parserOptions: {
@@ -31,9 +36,7 @@ export default tseslint.config(
       
       // Be less annoyingly strict about string template literals
       '@typescript-eslint/restrict-template-expressions': 'off',
-      
-      // Just causes problems, and doesn't catch anything the TypeScript compiler doesn't
-      'import/named': 'off',
+  
 
       // Allow unused variables that start with an underscore
       '@typescript-eslint/no-unused-vars': [
@@ -48,6 +51,12 @@ export default tseslint.config(
           ignoreRestSiblings: true,
         },
       ],
+
+      '@stylistic/indent': ['error', 2],
+      '@stylistic/semi': ['error', 'never'],
+
+      // Just causes problems, and doesn't catch anything the TypeScript compiler doesn't
+      'import/named': 'off',
 
       // Specify import order
       'import/order': [

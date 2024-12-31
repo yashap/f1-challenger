@@ -20,7 +20,7 @@ const bootstrap = async (port: number): Promise<void> => {
   const app = await NestAppBuilder.build(AppModule)
   // TODO: probably this CORS stuff is only necessary once this api starts being called by browsers?
   app.enableCors({
-    origin: ['http://localhost:3000'], // TODO: URL of the website domain
+    origin: ['http://localhost:1234'],
     allowedHeaders: ['content-type', ...supertokens.getAllCORSHeaders()],
     credentials: true,
   })
