@@ -19,6 +19,11 @@ import {
   ListLeaguesResponse,
   LeagueDto,
   UpdateLeagueRequest,
+  CreateLeagueMemberRequest,
+  ListLeagueMemberRequest,
+  ListLeagueMemberResponse,
+  LeagueMemberDto,
+  DeleteLeagueMemberRequest,
 } from './model/types'
 
 export class ChallengerClient {
@@ -50,6 +55,23 @@ export class ChallengerClient {
     },
     delete: (id: string): Promise<void> => {
       return extractDeleteResponse(this.client.leagues.delete({ params: { id } }))
+    },
+  }
+  public readonly leagueMember = {
+    listPage: (request: ListLeagueMemberRequest): Promise<ListLeagueMemberResponse> => {
+      return extractListResponse(this.client.leagueMember.list({ query: request }))
+    },
+    listAllPages: async (request: Omit<ListLeagueMemberRequest, 'cursor'>): Promise<LeagueMemberDto[]> => {
+      return fetchAllPages({ limit: DEFAULT_LIMIT, ...request }, (req) => this.leagueMember.listPage(req))
+    },
+    create: (request: CreateLeagueMemberRequest): Promise<LeagueMemberDto> => {
+      return extractPostResponse(this.client.leagueMember.post({ body: request }))
+    },
+    get: (id: string): Promise<LeagueMemberDto | undefined> => {
+      return extractGetByIdResponse(this.client.leagueMember.get({ params: { id } }))
+    },
+    delete: (request: DeleteLeagueMemberRequest): Promise<void> => {
+      return extractDeleteResponse(this.client.leagueMember.delete({ body: request }))
     },
   }
 }

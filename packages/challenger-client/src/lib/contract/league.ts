@@ -28,7 +28,7 @@ export const leagueContract = c.router({
   },
   get: {
     method: 'GET',
-    path: '/parkingSpots/:id',
+    path: '/leagues/:id',
     pathParams: z.object({
       id: z.string().uuid(),
     }),
@@ -37,7 +37,7 @@ export const leagueContract = c.router({
   },
   patch: {
     method: 'PATCH',
-    path: '/parkingSpots/:id',
+    path: '/leagues/:id',
     pathParams: z.object({
       id: z.string().uuid(),
     }),
@@ -47,7 +47,7 @@ export const leagueContract = c.router({
   },
   delete: {
     method: 'DELETE',
-    path: '/parkingSpots/:id',
+    path: '/leagues/:id',
     pathParams: z.object({
       id: z.string().uuid(),
     }),
