@@ -19,10 +19,11 @@ import {
   ListLeaguesResponse,
   LeagueDto,
   UpdateLeagueRequest,
-  CreateLeagueMembersRequest,
-  ListLeagueMembersRequest,
-  ListLeagueMembersResponse,
-  LeagueMembersDto,
+  CreateLeagueMemberRequest,
+  ListLeagueMemberRequest,
+  ListLeagueMemberResponse,
+  LeagueMemberDto,
+  DeleteLeagueMemberRequest,
 } from './model/types'
 
 export class ChallengerClient {
@@ -56,21 +57,21 @@ export class ChallengerClient {
       return extractDeleteResponse(this.client.leagues.delete({ params: { id } }))
     },
   }
-  public readonly leagueMembers = {
-    listPage: (request: ListLeagueMembersRequest): Promise<ListLeagueMembersResponse> => {
-      return extractListResponse(this.client.leagueMembers.list({ query: request }))
+  public readonly leagueMember = {
+    listPage: (request: ListLeagueMemberRequest): Promise<ListLeagueMemberResponse> => {
+      return extractListResponse(this.client.leagueMember.list({ query: request }))
     },
-    listAllPages: async (request: Omit<ListLeagueMembersRequest, 'cursor'>): Promise<LeagueMembersDto[]> => {
-      return fetchAllPages({ limit: DEFAULT_LIMIT, ...request }, (req) => this.leagueMembers.listPage(req))
+    listAllPages: async (request: Omit<ListLeagueMemberRequest, 'cursor'>): Promise<LeagueMemberDto[]> => {
+      return fetchAllPages({ limit: DEFAULT_LIMIT, ...request }, (req) => this.leagueMember.listPage(req))
     },
-    create: (request: CreateLeagueMembersRequest): Promise<LeagueMembersDto> => {
-      return extractPostResponse(this.client.leagueMembers.post({ body: request }))
+    create: (request: CreateLeagueMemberRequest): Promise<LeagueMemberDto> => {
+      return extractPostResponse(this.client.leagueMember.post({ body: request }))
     },
-    get: (id: string): Promise<LeagueMembersDto | undefined> => {
-      return extractGetByIdResponse(this.client.leagueMembers.get({ params: { id } }))
+    get: (id: string): Promise<LeagueMemberDto | undefined> => {
+      return extractGetByIdResponse(this.client.leagueMember.get({ params: { id } }))
     },
-    delete: (id: string): Promise<void> => {
-      return extractDeleteResponse(this.client.leagueMembers.delete({ params: { id } }))
+    delete: (request: DeleteLeagueMemberRequest): Promise<void> => {
+      return extractDeleteResponse(this.client.leagueMember.delete({ body: request }))
     },
   }
 }
