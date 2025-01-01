@@ -12,4 +12,28 @@ export interface Configuration {
   environment: 'dev' | 'prod'
   port: number
   auth: AuthConfig
+  socialSignIn: {
+    google: {
+      thirdPartyId: 'google'
+      clients: [
+        {
+          clientId: string
+          clientSecret: string
+        },
+      ]
+    }
+    apple: {
+      thirdPartyId: 'apple'
+      clients: [
+        {
+          clientId: string
+          additionalConfig: {
+            keyId: string
+            privateKey: string
+            teamId: string
+          }
+        },
+      ]
+    }
+  }
 }
