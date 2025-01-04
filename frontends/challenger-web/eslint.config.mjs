@@ -3,9 +3,11 @@ import globals from 'globals'
 import noRelativeImportPaths from 'eslint-plugin-no-relative-import-paths'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import pluginQuery from '@tanstack/eslint-plugin-query'
 
 export default [
   ...baseConfig,
+  ...pluginQuery.configs['flat/recommended'],
   {
     languageOptions: {
       ecmaVersion: 2020,
@@ -18,10 +20,7 @@ export default [
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       // Allow only absolute imports, no relative imports
       'no-relative-import-paths/no-relative-import-paths': ['error', { allowSameFolder: false }],
     },

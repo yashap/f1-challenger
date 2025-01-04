@@ -1,37 +1,26 @@
 import CssBaseline from '@mui/material/CssBaseline'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import 'src/App.css'
 import { SuperTokensWrapper } from 'supertokens-auth-react'
-import { SessionAuth } from 'supertokens-auth-react/recipe/session'
-import { buildAuthRoutes } from 'src/auth/buildAuthRoutes'
+import { AppRouter } from 'src/AppRouter'
 import { initAuth } from 'src/auth/initAuth'
-import { LeaguesPage } from 'src/pages/LeaguesPage'
 
 initAuth()
+
+const queryClient = new QueryClient()
 
 export const App = () => {
   return (
     <SuperTokensWrapper>
-      <CssBaseline enableColorScheme />
-      <BrowserRouter>
-        <Routes>
-          {buildAuthRoutes()}
-          <Route
-            path='leagues'
-            element={
-              <SessionAuth>
-                <LeaguesPage />
-              </SessionAuth>
-            }
-          />
-          <Route path='*' element={<Navigate to='/leagues' />} />
-        </Routes>
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <CssBaseline enableColorScheme />
+        <AppRouter />
+      </QueryClientProvider>
     </SuperTokensWrapper>
   )
 }
