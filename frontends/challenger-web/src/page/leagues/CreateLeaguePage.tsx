@@ -1,7 +1,8 @@
-import { Button, TextField } from '@mui/material'
+import { Button, TextField, Typography } from '@mui/material'
 import React, { FormEvent, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { ChallengerClientBuilder } from 'src/apiClient/ChallengerClientBuilder'
+import { Page } from 'src/component/Page'
 
 interface FormData {
   name: string
@@ -35,29 +36,32 @@ export const CreateLeaguePage = () => {
   }
 
   return (
-    <form onSubmit={onSubmit}>
-      <TextField
-        label='Name'
-        fullWidth
-        margin='normal'
-        value={formData.name}
-        onChange={(event) => {
-          setFormData({ ...formData, name: event.target.value })
-        }}
-        required
-      />
-      <TextField
-        label='Description'
-        fullWidth
-        margin='normal'
-        value={formData.description}
-        onChange={(event) => {
-          setFormData({ ...formData, description: event.target.value })
-        }}
-      />
-      <Button variant='contained' color='primary' type='submit'>
-        Submit
-      </Button>
-    </form>
+    <Page>
+      <Typography variant='h4'>Create League</Typography>
+      <form onSubmit={onSubmit}>
+        <TextField
+          label='Name'
+          fullWidth
+          margin='normal'
+          value={formData.name}
+          onChange={(event) => {
+            setFormData({ ...formData, name: event.target.value })
+          }}
+          required
+        />
+        <TextField
+          label='Description'
+          fullWidth
+          margin='normal'
+          value={formData.description}
+          onChange={(event) => {
+            setFormData({ ...formData, description: event.target.value })
+          }}
+        />
+        <Button variant='contained' color='primary' type='submit'>
+          Submit
+        </Button>
+      </form>
+    </Page>
   )
 }

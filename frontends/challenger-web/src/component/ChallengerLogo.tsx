@@ -1,14 +1,20 @@
+import { SxProps, Theme } from '@mui/material'
 import SvgIcon from '@mui/material/SvgIcon'
 import * as React from 'react'
 
 interface ChallengerLogoProps {
-  width?: number
-  height?: number
+  sx?: SxProps<Theme>
 }
 
-export const ChallengerLogo = ({ width = 120, height = 21 }: ChallengerLogoProps) => {
+const defaultSx = {
+  width: 120,
+  height: 21,
+}
+
+export const ChallengerLogo = ({ sx }: ChallengerLogoProps) => {
+  const { width, height, ...otherStyles } = { ...defaultSx, ...sx }
   return (
-    <SvgIcon sx={{ width, height }}>
+    <SvgIcon sx={{ width, height, ...otherStyles }}>
       <svg viewBox={`0 0 120 21`} xmlns='http://www.w3.org/2000/svg'>
         <path
           fill='#B4C0D3'

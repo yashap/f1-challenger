@@ -1,8 +1,9 @@
 import { required } from '@f1-challenger/errors'
+import { Typography } from '@mui/material'
 import React from 'react'
 import { useParams } from 'react-router'
 import { useChallengerClient } from 'src/apiClient/useChallengerClient'
-import { SignOutButton } from 'src/components/SignOutButton'
+import { Page } from 'src/component/Page'
 
 export const LeaguePage = () => {
   const { id } = useParams<{ id: string }>()
@@ -22,10 +23,9 @@ export const LeaguePage = () => {
     return <div>Error: {error.message}</div>
   }
   return (
-    <div>
-      <SignOutButton />
-      <h1>League</h1>
+    <Page>
+      <Typography variant='h4'>League</Typography>
       <div>{JSON.stringify(league)}</div>
-    </div>
+    </Page>
   )
 }
