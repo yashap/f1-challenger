@@ -1,8 +1,8 @@
-import { Button } from '@mui/material'
+import { Button, Typography } from '@mui/material'
 import React from 'react'
 import { Link } from 'react-router'
 import { useChallengerClient } from 'src/apiClient/useChallengerClient'
-import { SignOutButton } from 'src/components/SignOutButton'
+import { Page } from 'src/component/Page'
 
 export const LeaguesPage = () => {
   const {
@@ -21,9 +21,8 @@ export const LeaguesPage = () => {
     return <div>Error: {error.message}</div>
   }
   return (
-    <div>
-      <SignOutButton />
-      <h1>Leagues</h1>
+    <Page>
+      <Typography variant='h4'>Leagues</Typography>
       <ul>
         {leagues.map((league) => (
           <li key={league.id}>{JSON.stringify(league)}</li>
@@ -34,6 +33,6 @@ export const LeaguesPage = () => {
           Create League
         </Button>
       </Link>
-    </div>
+    </Page>
   )
 }

@@ -7,8 +7,8 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import 'src/App.css'
 import { SuperTokensWrapper } from 'supertokens-auth-react'
-import { AppRouter } from 'src/AppRouter'
 import { initAuth } from 'src/auth/initAuth'
+import { AppRouter } from 'src/router/AppRouter'
 
 initAuth()
 
@@ -16,11 +16,13 @@ const queryClient = new QueryClient()
 
 export const App = () => {
   return (
-    <SuperTokensWrapper>
-      <QueryClientProvider client={queryClient}>
-        <CssBaseline enableColorScheme />
-        <AppRouter />
-      </QueryClientProvider>
-    </SuperTokensWrapper>
+    <React.StrictMode>
+      <SuperTokensWrapper>
+        <QueryClientProvider client={queryClient}>
+          <CssBaseline enableColorScheme />
+          <AppRouter />
+        </QueryClientProvider>
+      </SuperTokensWrapper>
+    </React.StrictMode>
   )
 }
