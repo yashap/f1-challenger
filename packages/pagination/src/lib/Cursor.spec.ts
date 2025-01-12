@@ -28,6 +28,7 @@ describe('Cursor', () => {
         limit: 10,
         orderBy: 'age',
         orderDirection: 'asc',
+        reverseAfterFetch: false,
         lastOrderValueSeen: 10,
         lastIdSeen: '123',
       }
@@ -45,6 +46,7 @@ describe('Cursor', () => {
         limit: 10,
         orderBy: 'age',
         orderDirection: 'asc',
+        reverseAfterFetch: true,
         lastOrderValueSeen: 10,
         lastIdSeen: '123',
       }
@@ -58,6 +60,7 @@ describe('Cursor', () => {
         limit: 10,
         orderBy: 'age',
         orderDirection: 'desc',
+        reverseAfterFetch: false,
         lastOrderValueSeen: 10,
         lastIdSeen: '123',
       }
@@ -71,6 +74,7 @@ describe('Cursor', () => {
         limit: '11',
         orderBy: 'age',
         orderDirection: 'asc',
+        reverseAfterFetch: true,
         lastOrderValueSeen: 10,
         lastIdSeen: '123',
       } as unknown as UserCursor)
@@ -81,6 +85,7 @@ describe('Cursor', () => {
       const cursor = encodeCursor({
         orderBy: 'age',
         orderDirection: 'asc',
+        reverseAfterFetch: false,
         lastOrderValueSeen: 10,
         lastIdSeen: '123',
       } as unknown as UserCursor)
@@ -92,6 +97,7 @@ describe('Cursor', () => {
         limit: 0,
         orderBy: 'age',
         orderDirection: 'asc',
+        reverseAfterFetch: false,
         lastOrderValueSeen: 10,
         lastIdSeen: '123',
       } as unknown as UserCursor)
@@ -103,6 +109,7 @@ describe('Cursor', () => {
         limit: DEFAULT_MAX_LIMIT + 1,
         orderBy: 'age',
         orderDirection: 'asc',
+        reverseAfterFetch: false,
         lastOrderValueSeen: 10,
         lastIdSeen: '123',
       } as unknown as UserCursor)
@@ -114,6 +121,7 @@ describe('Cursor', () => {
         limit: 10,
         orderBy: 'foo',
         orderDirection: 'asc',
+        reverseAfterFetch: false,
         lastOrderValueSeen: 10,
         lastIdSeen: '123',
       } as unknown as UserCursor)
@@ -124,6 +132,7 @@ describe('Cursor', () => {
       const cursor = encodeCursor({
         limit: 10,
         orderDirection: 'asc',
+        reverseAfterFetch: false,
         lastOrderValueSeen: 10,
         lastIdSeen: '123',
       } as unknown as UserCursor)
@@ -135,6 +144,7 @@ describe('Cursor', () => {
         limit: 10,
         orderBy: 'age',
         orderDirection: 'foo',
+        reverseAfterFetch: false,
         lastOrderValueSeen: 10,
         lastIdSeen: '123',
       } as unknown as UserCursor)
@@ -142,6 +152,29 @@ describe('Cursor', () => {
     })
 
     it('throws an error if the cursor has a missing orderDirection field', () => {
+      const cursor = encodeCursor({
+        limit: 10,
+        orderBy: 'age',
+        reverseAfterFetch: false,
+        lastOrderValueSeen: 10,
+        lastIdSeen: '123',
+      } as unknown as UserCursor)
+      expect(() => decodeCursor(cursor, parseUserOrdering)).toThrow(InputValidationError)
+    })
+
+    it('throws an error if the cursor has a reverseAfterFetch field with the wrong type', () => {
+      const cursor = encodeCursor({
+        limit: 10,
+        orderBy: 'age',
+        orderDirection: 'foo',
+        reverseAfterFetch: 'false',
+        lastOrderValueSeen: 10,
+        lastIdSeen: '123',
+      } as unknown as UserCursor)
+      expect(() => decodeCursor(cursor, parseUserOrdering)).toThrow(InputValidationError)
+    })
+
+    it('throws an error if the cursor has a missing reverseAfterFetch field', () => {
       const cursor = encodeCursor({
         limit: 10,
         orderBy: 'age',
@@ -156,6 +189,7 @@ describe('Cursor', () => {
         limit: 10,
         orderBy: 'age',
         orderDirection: 'asc',
+        reverseAfterFetch: false,
         lastOrderValueSeen: '10',
         lastIdSeen: '123',
       } as unknown as UserCursor)
@@ -167,6 +201,7 @@ describe('Cursor', () => {
         limit: 10,
         orderBy: 'age',
         orderDirection: 'asc',
+        reverseAfterFetch: false,
         lastIdSeen: '123',
       } as unknown as UserCursor)
       expect(() => decodeCursor(cursor, parseUserOrdering)).toThrow(InputValidationError)
@@ -177,6 +212,7 @@ describe('Cursor', () => {
         limit: 10,
         orderBy: 'age',
         orderDirection: 'asc',
+        reverseAfterFetch: false,
         lastOrderValueSeen: 10,
         lastIdSeen: 123,
       } as unknown as UserCursor)
@@ -188,6 +224,7 @@ describe('Cursor', () => {
         limit: 10,
         orderBy: 'age',
         orderDirection: 'asc',
+        reverseAfterFetch: false,
         lastOrderValueSeen: 10,
       } as unknown as UserCursor)
       expect(() => decodeCursor(cursor, parseUserOrdering)).toThrow(InputValidationError)

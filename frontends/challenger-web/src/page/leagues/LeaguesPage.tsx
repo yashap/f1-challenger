@@ -2,7 +2,9 @@ import { Button, Typography } from '@mui/material'
 import React from 'react'
 import { Link } from 'react-router'
 import { useChallengerClient } from 'src/apiClient/useChallengerClient'
+import { AsyncContent } from 'src/component/AsyncContent'
 import { Page } from 'src/component/Page'
+import { LeagueTable } from 'src/page/leagues/components/LeagueTable'
 
 export const LeaguesPage = () => {
   const {
@@ -14,20 +16,12 @@ export const LeaguesPage = () => {
     queryFn: (client) => client.leagues.listAllPages({}),
   })
 
-  if (status === 'pending') {
-    return <div>Loading...</div>
-  }
-  if (status === 'error') {
-    return <div>Error: {error.message}</div>
-  }
   return (
     <Page>
       <Typography variant='h4'>Leagues</Typography>
-      <ul>
-        {leagues.map((league) => (
-          <li key={league.id}>{JSON.stringify(league)}</li>
-        ))}
-      </ul>
+      <AsyncContent status={status} error={error}>
+        {leagues && <LeagueTable leagues={leagues} />}
+      </AsyncContent>
       <Link to='/leagues/new'>
         <Button variant='contained' color='primary' type='submit'>
           Create League

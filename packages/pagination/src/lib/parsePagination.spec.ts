@@ -39,6 +39,7 @@ describe(parsePagination.name, () => {
       limit: 10,
       orderBy: 'age',
       orderDirection: 'asc',
+      reverseAfterFetch: false,
       lastOrderValueSeen: '10',
       lastIdSeen: '1',
     }
@@ -65,6 +66,7 @@ describe(parsePagination.name, () => {
         limit: 10,
         orderBy: 'age',
         orderDirection: 'asc',
+        reverseAfterFetch: false,
         lastOrderValueSeen: '10',
         lastIdSeen: true as unknown as string,
       }),
@@ -81,6 +83,7 @@ describe(parsePagination.name, () => {
         limit: 10,
         orderBy: 'age',
         orderDirection: 'asc',
+        reverseAfterFetch: false,
         lastOrderValueSeen: '10',
         lastIdSeen: '1',
       }),

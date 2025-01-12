@@ -3,6 +3,7 @@ import { Typography } from '@mui/material'
 import React from 'react'
 import { useParams } from 'react-router'
 import { useChallengerClient } from 'src/apiClient/useChallengerClient'
+import { AsyncContent } from 'src/component/AsyncContent'
 import { Page } from 'src/component/Page'
 
 export const LeaguePage = () => {
@@ -16,16 +17,12 @@ export const LeaguePage = () => {
     queryFn: (client) => client.leagues.get(required(id)),
   })
 
-  if (status === 'pending') {
-    return <div>Loading...</div>
-  }
-  if (status === 'error') {
-    return <div>Error: {error.message}</div>
-  }
   return (
     <Page>
       <Typography variant='h4'>League</Typography>
-      <div>{JSON.stringify(league)}</div>
+      <AsyncContent status={status} error={error}>
+        {league && <div>{JSON.stringify(league)}</div>}
+      </AsyncContent>
     </Page>
   )
 }

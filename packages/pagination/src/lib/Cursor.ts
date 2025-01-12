@@ -8,6 +8,13 @@ const CursorSchema = z.object({
   limit: z.number().min(1).max(DEFAULT_MAX_LIMIT).describe('Number of items to fetch'),
   orderBy: z.string().describe('Field to order by'),
   orderDirection: OrderDirectionSchema.describe('Order direction'),
+  reverseAfterFetch: z
+    .boolean()
+    .describe(
+      'Should the records be reversed after fetching? For example, if orderDirection is desc, but reverseAfterFetch ' +
+        'true, the records are first fetched in descending order from the last order value/id seen, but should then be reversed ' +
+        'in-memory after fetching, into ascending order.'
+    ),
   lastOrderValueSeen: z.unknown().describe('Last order value seen'),
   lastIdSeen: z.string().describe('Last id seen'),
 })
@@ -25,6 +32,7 @@ export interface Pagination<K extends string> {
  * Information encoded within a cursor - basic pagination fields, plus information about the last record seen
  */
 export interface Cursor<K extends string, V> extends Pagination<K> {
+  reverseAfterFetch: boolean
   lastOrderValueSeen: V
   lastIdSeen: string
 }
