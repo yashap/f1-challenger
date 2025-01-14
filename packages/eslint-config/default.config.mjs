@@ -52,7 +52,6 @@ export default tseslint.config(
         },
       ],
 
-      '@stylistic/indent': ['error', 2],
       '@stylistic/semi': ['error', 'never'],
 
       // Just causes problems, and doesn't catch anything the TypeScript compiler doesn't
