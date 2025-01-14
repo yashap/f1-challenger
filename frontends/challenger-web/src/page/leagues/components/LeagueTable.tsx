@@ -65,10 +65,10 @@ export const LeagueTable = () => {
         ...(cursor.current
           ? { cursor: cursor.current }
           : {
-            limit: paginationModel.pageSize,
-            orderBy: sortItem.field,
-            orderDirection: sortItem.sort ?? 'desc',
-          }),
+              limit: paginationModel.pageSize,
+              orderBy: sortItem.field,
+              orderDirection: sortItem.sort ?? 'desc',
+            }),
       })
       if (!isPagingBackwards && leaguesResponse.data.length < paginationModel.pageSize) {
         setRowCount(paginationModel.page * paginationModel.pageSize + leaguesResponse.data.length)

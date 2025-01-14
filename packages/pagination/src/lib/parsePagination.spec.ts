@@ -1,6 +1,7 @@
 import { InputValidationError } from '@f1-challenger/errors'
 import { z } from 'zod'
 import { Cursor, encodeCursor } from './Cursor'
+import { OrderDirectionValues } from './orderDirection'
 import { PaginationRequestDto } from './paginationDto'
 import { parsePagination } from './parsePagination'
 
@@ -28,7 +29,7 @@ describe(parsePagination.name, () => {
     const dto: PaginationRequestDto = {
       limit: 10,
       orderBy: 'age',
-      orderDirection: 'asc',
+      orderDirection: OrderDirectionValues.asc,
     }
     const parsedPaginationDetails = parsePagination(dto, parseUserOrdering)
     expect(parsedPaginationDetails).toEqual(dto)
@@ -38,8 +39,8 @@ describe(parsePagination.name, () => {
     const cursor: UserCursor = {
       limit: 10,
       orderBy: 'age',
-      orderDirection: 'asc',
-      reverseAfterFetch: false,
+      orderDirection: OrderDirectionValues.asc,
+      initialOrderDirection: OrderDirectionValues.asc,
       lastOrderValueSeen: '10',
       lastIdSeen: '1',
     }
@@ -65,8 +66,8 @@ describe(parsePagination.name, () => {
       cursor: encodeCursor({
         limit: 10,
         orderBy: 'age',
-        orderDirection: 'asc',
-        reverseAfterFetch: false,
+        orderDirection: OrderDirectionValues.asc,
+        initialOrderDirection: OrderDirectionValues.asc,
         lastOrderValueSeen: '10',
         lastIdSeen: true as unknown as string,
       }),
@@ -78,12 +79,12 @@ describe(parsePagination.name, () => {
     const dto: PaginationRequestDto = {
       limit: 10,
       orderBy: 'age',
-      orderDirection: 'asc',
+      orderDirection: OrderDirectionValues.asc,
       cursor: encodeCursor({
         limit: 10,
         orderBy: 'age',
-        orderDirection: 'asc',
-        reverseAfterFetch: false,
+        orderDirection: OrderDirectionValues.asc,
+        initialOrderDirection: OrderDirectionValues.asc,
         lastOrderValueSeen: '10',
         lastIdSeen: '1',
       }),

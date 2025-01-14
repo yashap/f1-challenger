@@ -1,5 +1,5 @@
 import { contract as rootContract } from '@f1-challenger/challenger-client'
-import { buildPaginationQuery } from '@f1-challenger/drizzle-utils'
+import { runQueryWithPagination } from '@f1-challenger/drizzle-utils'
 import { ForbiddenError, required } from '@f1-challenger/errors'
 import { BaseController, Endpoint, HandlerResult, HttpStatus, handler } from '@f1-challenger/nest-utils'
 import { buildPaginatedResponse, parsePagination } from '@f1-challenger/pagination'
@@ -30,19 +30,20 @@ export class LeagueMemberController extends BaseController {
     return handler(contract.list, async ({ query }) => {
       const { userId, leagueId } = query
       const pagination: ListLeagueMemberPagination = parsePagination(query, parseLeagueMemberOrdering)
-      const { where, orderBy, limit } = buildPaginationQuery(leagueMemberTable, pagination)
-      const leagueMember = await this.db.db().query.leagueMemberTable.findMany({
-        where: and(
-          leagueId ? eq(leagueMemberTable.leagueId, leagueId) : undefined,
-          and(userId ? eq(leagueMemberTable.userId, userId) : undefined),
-          where
-        ),
-        orderBy,
-        limit,
+      const leagueMembers = await runQueryWithPagination(pagination, leagueMemberTable, ({ where, orderBy, limit }) => {
+        return this.db.db().query.leagueMemberTable.findMany({
+          where: and(
+            leagueId ? eq(leagueMemberTable.leagueId, leagueId) : undefined,
+            and(userId ? eq(leagueMemberTable.userId, userId) : undefined),
+            where
+          ),
+          orderBy,
+          limit,
+        })
       })
       return {
         status: HttpStatus.OK,
-        body: buildPaginatedResponse(leagueMember.map(leagueMemberToDto), pagination),
+        body: buildPaginatedResponse(leagueMembers.map(leagueMemberToDto), pagination),
       }
     })
   }
@@ -75,8 +76,6 @@ export class LeagueMemberController extends BaseController {
     })
   }
 
-  ////
-
   @Endpoint(contract.delete)
   @UseGuards(new AuthGuard())
   public delete(@Session() session: SessionContainer): HandlerResult<typeof contract.delete> {
@@ -86,8 +85,6 @@ export class LeagueMemberController extends BaseController {
       return { status: HttpStatus.NO_CONTENT, body: undefined }
     })
   }
-
-  //// NEEEDED ?
 
   private async getAndVerifyOwnership(
     leagueId: string,

@@ -11,7 +11,7 @@ import { OrderDirectionValues } from '@f1-challenger/pagination'
 import { Temporal } from '@js-temporal/polyfill'
 import { INestApplication } from '@nestjs/common'
 import { eq } from 'drizzle-orm'
-import { omit, sortBy } from 'lodash'
+import { omit } from 'lodash'
 import { v4 as uuid } from 'uuid'
 import { AuthGuard } from 'src/auth'
 import { Db } from 'src/db/Db'
@@ -226,7 +226,7 @@ describe(LeagueController.name, () => {
           cursor: page2.pagination.previous,
         })
 
-        expect(sortBy(page1Again.data, 'id')).toStrictEqual(sortBy(page1.data, 'id'))
+        expect(page1Again.data).toStrictEqual(page1.data)
       })
 
       it('lists all parking spots', async () => {

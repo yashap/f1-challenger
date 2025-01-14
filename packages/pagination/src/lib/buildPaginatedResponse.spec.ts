@@ -2,13 +2,12 @@ import { required } from '@f1-challenger/errors'
 import { v4 as uuid } from 'uuid'
 import { z } from 'zod'
 import { buildPaginatedResponse } from './buildPaginatedResponse'
-import { Cursor, decodeCursor } from './Cursor'
+import { AsPagination, Cursor, decodeCursor } from './Cursor'
 import { OrderDirection, OrderDirectionValues } from './orderDirection'
 
 describe(buildPaginatedResponse.name, () => {
   type UserCursor = Cursor<'age', number>
-  type UserInitialPagination = Omit<UserCursor, 'reverseAfterFetch' | 'lastOrderValueSeen' | 'lastIdSeen'>
-  type UserPagination = UserInitialPagination | UserCursor
+  type UserPagination = AsPagination<UserCursor>
 
   interface User {
     id: string
@@ -45,13 +44,12 @@ describe(buildPaginatedResponse.name, () => {
      * - The next 10 youngest users who are older than 19
      * - So it should be ascending order, but older than 19
      * - And the order `20, 21, 22, ...` is already correct
-     *   - Thus reverseAfterFetch should be false
      *
      * Previous page:
      * - The next 10 oldest users who are younger than 10
      * - So it should be descending order, but younger than 10
      * - However, we want it to be "the page before", so not in the order `9, 8, 7, ...`, but the order `..., 7, 8, 9`
-     *   - Thus reverseAfterFetch should be true
+     *   - This need to flip is implied by orderDirection and initialOrderDirection being different
      */
     const limit = 10
     const users = buildUsers(limit, OrderDirectionValues.asc)
@@ -69,18 +67,18 @@ describe(buildPaginatedResponse.name, () => {
     const nextCursor = decodeCursor(required(paginatedResponse.pagination.next), parseUserOrdering)
     expect(nextCursor).toStrictEqual({
       ...pagination,
+      initialOrderDirection: OrderDirectionValues.asc,
       lastIdSeen: required(users[users.length - 1]).id,
       lastOrderValueSeen: required(users[users.length - 1]).age,
-      reverseAfterFetch: false,
     })
 
     const previousCursor = decodeCursor(required(paginatedResponse.pagination.previous), parseUserOrdering)
     expect(previousCursor).toStrictEqual({
       ...pagination,
+      orderDirection: OrderDirectionValues.desc,
+      initialOrderDirection: OrderDirectionValues.asc,
       lastIdSeen: required(users[0]).id,
       lastOrderValueSeen: required(users[0]).age,
-      orderDirection: OrderDirectionValues.desc,
-      reverseAfterFetch: true,
     })
   })
 
@@ -93,13 +91,12 @@ describe(buildPaginatedResponse.name, () => {
      * - The next 10 oldest users who are younger than 10
      * - So it should be descending order, but younger than 10
      * - And the order `9, 8, 7, ...` is already correct
-     *   - Thus reverseAfterFetch should be false
      *
      * Previous page:
      * - The next 10 youngest users who are older than 19
      * - So it should be ascending order, but older than 19
      * - However, we want it to be "the page before", so not in the order `20, 21, 22, ...`, but the order `..., 22, 21, 20`
-     *   - Thus reverseAfterFetch should be true
+     *   - This need to flip is implied by orderDirection and initialOrderDirection being different
      */
     const limit = 10
     const users = buildUsers(limit, OrderDirectionValues.desc)
@@ -116,39 +113,42 @@ describe(buildPaginatedResponse.name, () => {
     const nextCursor = decodeCursor(required(paginatedResponse.pagination.next), parseUserOrdering)
     expect(nextCursor).toStrictEqual({
       ...pagination,
+      initialOrderDirection: OrderDirectionValues.desc,
       lastIdSeen: required(users[users.length - 1]).id,
       lastOrderValueSeen: required(users[users.length - 1]).age,
-      reverseAfterFetch: false,
     })
 
     const previousCursor = decodeCursor(required(paginatedResponse.pagination.previous), parseUserOrdering)
     expect(previousCursor).toStrictEqual({
       ...pagination,
+      orderDirection: OrderDirectionValues.asc,
+      initialOrderDirection: OrderDirectionValues.desc,
       lastIdSeen: required(users[0]).id,
       lastOrderValueSeen: required(users[0]).age,
-      orderDirection: OrderDirectionValues.asc,
-      reverseAfterFetch: true,
     })
   })
 
-  it('builds a paginated response for a subsequent page for ascending sort order (but reversed after fetch), with proper cursors', () => {
+  it('builds a paginated response for a subsequent page for ascending sort order, where the initial order was descending, with proper cursors', () => {
     /**
      * This page (older than 9 ascending, then reversed) would have been this before reversing:
      *   10, 11, 12, 13, 14, 15, 16, 17, 18, 19
      * But then after reversing:
      *   19, 18, 17, 16, 15, 14, 13, 12, 11, 10
      *
-     * Next page:
-     * - The next 10 youngest users who are older than 19, but reversed
-     * - So it should be ascending order, but older than 19
-     * - However, the order `20, 21, 22, ...` is incorrect, we want it to be `..., 22, 21, 20`
-     *   - Thus reverseAfterFetch should be true
+     * Next and prev are with respect to the initial ordering. As the initial ordering was descending, next should have
+     * values smaller than what we've seen (less than 10), while prev should have values larger than what we've seen
+     * (greater than 19).
      *
-     * Previous page:
+     * Next page:
      * - The next 10 oldest users who are younger than 10
      * - So it should be descending order, but younger than 10
      * - And the order `9, 8, 7, ...` is already correct
-     *   - Thus reverseAfterFetch should be false
+     *
+     * Previous page:
+     * - The next 10 youngest users who are older than 19, but reversed
+     * - So it should be ascending order, but older than 19
+     * - However, the order `20, 21, 22, ...` is incorrect, we want it to be `..., 22, 21, 20`
+     *   - This need to flip is implied by orderDirection and initialOrderDirection being different
      */
     const limit = 10
     const users = buildUsers(limit, OrderDirectionValues.asc).reverse()
@@ -156,7 +156,7 @@ describe(buildPaginatedResponse.name, () => {
       limit,
       orderBy: 'age',
       orderDirection: OrderDirectionValues.asc,
-      reverseAfterFetch: true,
+      initialOrderDirection: OrderDirectionValues.desc,
       lastOrderValueSeen: 9,
       lastIdSeen: 'someId',
     }
@@ -168,39 +168,41 @@ describe(buildPaginatedResponse.name, () => {
     const nextCursor = decodeCursor(required(paginatedResponse.pagination.next), parseUserOrdering)
     expect(nextCursor).toStrictEqual({
       ...pagination,
-      lastIdSeen: required(users[0]).id,
-      lastOrderValueSeen: required(users[0]).age,
-      reverseAfterFetch: true,
+      orderDirection: OrderDirectionValues.desc,
+      lastIdSeen: required(users[users.length - 1]).id,
+      lastOrderValueSeen: required(users[users.length - 1]).age,
     })
 
     const previousCursor = decodeCursor(required(paginatedResponse.pagination.previous), parseUserOrdering)
     expect(previousCursor).toStrictEqual({
       ...pagination,
-      lastIdSeen: required(users[users.length - 1]).id,
-      lastOrderValueSeen: required(users[users.length - 1]).age,
-      orderDirection: OrderDirectionValues.desc,
-      reverseAfterFetch: false,
+      orderDirection: OrderDirectionValues.asc,
+      lastIdSeen: required(users[0]).id,
+      lastOrderValueSeen: required(users[0]).age,
     })
   })
 
-  it('builds a paginated response for a subsequent page for descending sort order (but reversed after fetch), with proper cursors', () => {
+  it('builds a paginated response for a subsequent page for descending sort order, where the initial order was ascending, with proper cursors', () => {
     /**
      * This page (younger than 20 descending, then reversed) would have been this before reversing:
      *   19, 18, 17, 16, 15, 14, 13, 12, 11, 10
      * But then after reversing:
      *   10, 11, 12, 13, 14, 15, 16, 17, 18, 19
      *
-     * Next page:
-     * - The next 10 oldest users who are younger than 10
-     * - So it should be descending order, but younger than 10
-     * - However, the order `9, 8, 7, ...` is incorrect, we want it to be `..., 7, 8, 9`
-     *   - Thus reverseAfterFetch should be true
+     * Next and prev are with respect to the initial ordering. As the initial ordering was ascending, next should have
+     * values larger than what we've seen (greater than 19), while prev should have values smaller than what we've seen
+     * (less than 10).
      *
-     * Previous page:
+     * Next page:
      * - The next 10 youngest users who are older than 19
      * - So it should be ascending order, but older than 19
      * - And the order `20, 21, 22, ...` is aleady correct
-     *   - Thus reverseAfterFetch should be false
+     *
+     * Previous page:
+     * - The next 10 oldest users who are younger than 10
+     * - So it should be descending order, but younger than 10
+     * - However, the order `9, 8, 7, ...` is incorrect, we want it to be `..., 7, 8, 9`
+     *   - This need to flip is implied by orderDirection and initialOrderDirection being different
      */
     const limit = 10
     const users = buildUsers(limit, OrderDirectionValues.desc).reverse()
@@ -208,7 +210,7 @@ describe(buildPaginatedResponse.name, () => {
       limit,
       orderBy: 'age',
       orderDirection: OrderDirectionValues.desc,
-      reverseAfterFetch: true,
+      initialOrderDirection: OrderDirectionValues.asc,
       lastOrderValueSeen: 20,
       lastIdSeen: 'someId',
     }
@@ -220,18 +222,17 @@ describe(buildPaginatedResponse.name, () => {
     const nextCursor = decodeCursor(required(paginatedResponse.pagination.next), parseUserOrdering)
     expect(nextCursor).toStrictEqual({
       ...pagination,
-      lastIdSeen: required(users[0]).id,
-      lastOrderValueSeen: required(users[0]).age,
-      reverseAfterFetch: true,
+      orderDirection: OrderDirectionValues.asc,
+      lastIdSeen: required(users[users.length - 1]).id,
+      lastOrderValueSeen: required(users[users.length - 1]).age,
     })
 
     const previousCursor = decodeCursor(required(paginatedResponse.pagination.previous), parseUserOrdering)
     expect(previousCursor).toStrictEqual({
       ...pagination,
-      lastIdSeen: required(users[users.length - 1]).id,
-      lastOrderValueSeen: required(users[users.length - 1]).age,
-      orderDirection: OrderDirectionValues.asc,
-      reverseAfterFetch: false,
+      orderDirection: OrderDirectionValues.desc,
+      lastIdSeen: required(users[0]).id,
+      lastOrderValueSeen: required(users[0]).age,
     })
   })
 

@@ -8,13 +8,7 @@ const CursorSchema = z.object({
   limit: z.number().min(1).max(DEFAULT_MAX_LIMIT).describe('Number of items to fetch'),
   orderBy: z.string().describe('Field to order by'),
   orderDirection: OrderDirectionSchema.describe('Order direction'),
-  reverseAfterFetch: z
-    .boolean()
-    .describe(
-      'Should the records be reversed after fetching? For example, if orderDirection is desc, but reverseAfterFetch ' +
-        'true, the records are first fetched in descending order from the last order value/id seen, but should then be reversed ' +
-        'in-memory after fetching, into ascending order.'
-    ),
+  initialOrderDirection: OrderDirectionSchema.describe('The order direction for the first page'),
   lastOrderValueSeen: z.unknown().describe('Last order value seen'),
   lastIdSeen: z.string().describe('Last id seen'),
 })
@@ -22,7 +16,7 @@ const CursorSchema = z.object({
 /**
  * Basic pagination fields, used especially for fetching the first page
  */
-export interface Pagination<K extends string> {
+export interface InitialPagination<K extends string> {
   limit: number
   orderBy: K
   orderDirection: OrderDirection
@@ -31,11 +25,25 @@ export interface Pagination<K extends string> {
 /**
  * Information encoded within a cursor - basic pagination fields, plus information about the last record seen
  */
-export interface Cursor<K extends string, V> extends Pagination<K> {
-  reverseAfterFetch: boolean
+export interface Cursor<K extends string, V> extends InitialPagination<K> {
+  initialOrderDirection: OrderDirection
   lastOrderValueSeen: V
   lastIdSeen: string
 }
+
+/**
+ * Either the pagination fields to fetch the initial page, or a parsed cursor to fetch a subsequent page
+ */
+export type Pagination<K extends string, V> = InitialPagination<K> | Cursor<K, V>
+
+/**
+ * If you have a Cursor type, and you want to turn it into a Pagination type, you can just:
+ *
+ * type UserPagination = AsPagination<UserCursor>
+ */
+export type AsPagination<C extends Cursor<K, V>, K extends string = string, V = unknown> =
+  | C
+  | Omit<C, 'initialOrderDirection' | 'lastOrderValueSeen' | 'lastIdSeen'>
 
 /**
  * A function that can parse (both validate and transform) the ordering fields of a cursor
