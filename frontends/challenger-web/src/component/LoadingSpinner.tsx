@@ -1,16 +1,11 @@
-import { Container, CircularProgress, styled } from '@mui/material'
+import { CircularProgress } from '@mui/material'
 import React from 'react'
-
-const LoadingContainer = styled(Container)({
-  display: 'flex',
-  justifyContent: 'center',
-  padding: '20px 0',
-})
+import { CenteringContainer } from 'src/component/CenteringContainer'
 
 export const LoadingSpinner = () => {
   return (
-    <LoadingContainer>
+    <CenteringContainer>
       <CircularProgress />
-    </LoadingContainer>
+    </CenteringContainer>
   )
 }

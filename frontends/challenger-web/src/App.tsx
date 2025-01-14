@@ -12,7 +12,16 @@ import { AppRouter } from 'src/router/AppRouter'
 
 initAuth()
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+    mutations: {
+      retry: false,
+    },
+  },
+})
 
 export const App = () => {
   return (

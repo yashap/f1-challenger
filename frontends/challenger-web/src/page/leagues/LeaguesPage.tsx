@@ -2,7 +2,7 @@ import { Button, Typography } from '@mui/material'
 import React from 'react'
 import { Link } from 'react-router'
 import { Page } from 'src/component/Page'
-import { LeagueTable } from 'src/page/leagues/components/LeagueTable'
+import { LeagueTable } from 'src/page/leagues/component/LeagueTable'
 
 export const LeaguesPage = () => (
   <Page>

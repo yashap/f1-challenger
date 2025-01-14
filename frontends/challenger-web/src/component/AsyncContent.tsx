@@ -1,6 +1,6 @@
-import { Container } from '@mui/material'
 import { UseQueryResult } from '@tanstack/react-query'
 import React, { JSX } from 'react'
+import { ErrorContent } from 'src/component/ErrorContent'
 import { LoadingSpinner } from 'src/component/LoadingSpinner'
 
 type Props = Pick<UseQueryResult, 'status' | 'error'> & {
@@ -12,7 +12,7 @@ export const AsyncContent = ({ status, error, children }: Props): JSX.Element =>
     return <LoadingSpinner />
   }
   if (status === 'error') {
-    return <Container>{error?.message ?? 'Something went wrong'}</Container>
+    return <ErrorContent error={error ?? 'Something went wrong'} />
   }
 
   return <>{children}</>
