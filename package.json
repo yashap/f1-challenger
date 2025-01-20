@@ -21,7 +21,6 @@
     "db:up": "./tools/scripts/ensure_postgres_up.sh",
     "db:up:test": "./tools/scripts/ensure_postgres_up.sh -p 5441 -c f1_challenger_postgres_test -v f1_challenger_postgres_data_test",
     "db:restore-fixtures": "turbo run db:restore-fixtures",
-    "email": "open http://127.0.0.1:4436",
     "format": "prettier --write \"**/*.{ts,tsx,md,js,jsx,json}\" && turbo run format",
     "lint": "prettier --check \"**/*.{ts,tsx,md,js,jsx,json}\" && turbo run lint --force",
     "serve:backend": "turbo run serve --filter='./backends/*' --parallel",

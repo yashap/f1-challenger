@@ -50,9 +50,9 @@ yarn serve:backend
 # Serve the frontend (in watch mode)
 yarn serve:frontend
 
-# Note that sometimes the frontend hot reloading gets stuck in a weird state, where it keeps
-# loading an old page, won't show your changes. If this happens, you can fix it by running the
-# following, then running yarn serve:frontend again:
+# Note that sometimes the frontend hot reloading gets stuck in a weird state, where it
+# keeps loading an old page, won't show your changes. If this happens, you can fix it by
+# running the following, then running `yarn serve:frontend` again:
 yarn workspace @f1-challenger/challenger-web clean
 
 # Before you push to GitHub (no CI setup yet, so do this manually!)
@@ -62,10 +62,6 @@ yarn format && yarn test
 ### Migrations
 
 See the `README.md` for each backend service for instructions about migrations.
-
-### Email
-
-We don't send emails locally - instead, they get sent to [MailSlurper](https://www.mailslurper.com/), a small SMTP mail server, that saves emails to an in-memory DB, and lets you view them in a UI. If you want to check on emails (e.g. account verification emails, password reset emails, etc.), as long as your local backend is running (`yarn serve:backend`), you can run `yarn email` from the root of this repo to view them.
 
 ### Install Dependencies
 
