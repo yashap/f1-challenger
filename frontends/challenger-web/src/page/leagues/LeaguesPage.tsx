@@ -10,9 +10,7 @@ export const LeaguesPage = () => (
     <Typography variant='h4'>Leagues</Typography>
     <LeagueTable />
     <Link to='/leagues/new'>
-      <Button type='submit'>
-        Create League
-      </Button>
+      <Button type='submit'>Create League</Button>
     </Link>
   </Page>
 )

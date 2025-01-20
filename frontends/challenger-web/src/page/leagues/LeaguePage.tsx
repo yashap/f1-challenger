@@ -4,7 +4,7 @@ import React from 'react'
 import { useParams } from 'react-router'
 import { useChallengerClient } from 'src/apiClient/useChallengerClient'
 import { AsyncContent } from 'src/component/AsyncContent'
-import { Field , Fields } from 'src/component/Field'
+import { Field, Fields } from 'src/component/Field'
 import { Page } from 'src/component/Page'
 
 export const LeaguePage = () => {
