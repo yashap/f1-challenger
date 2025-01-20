@@ -1,12 +1,12 @@
 import { InputValidationError } from '@f1-challenger/errors'
 import { DEFAULT_LIMIT, DEFAULT_ORDER_BY, DEFAULT_ORDER_DIRECTION } from './constants'
-import { Cursor, Pagination, ParseOrdering, decodeCursor } from './Cursor'
+import { Pagination, ParseOrdering, decodeCursor } from './Cursor'
 import { PaginationRequestDto } from './paginationDto'
 
 export const parsePagination = <K extends string, V>(
   dto: PaginationRequestDto,
   parseOrdering: ParseOrdering<K, V>
-): Pagination<K> | Cursor<K, V> => {
+): Pagination<K, V> => {
   const { limit = DEFAULT_LIMIT, orderBy = DEFAULT_ORDER_BY, orderDirection = DEFAULT_ORDER_DIRECTION, cursor } = dto
 
   // The request was anything but the first request, has a cursor

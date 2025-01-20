@@ -1,10 +1,10 @@
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import { alpha, styled } from '@mui/material/styles'
 import Toolbar from '@mui/material/Toolbar'
 import React from 'react'
 import { Link } from 'react-router'
+import { Button } from 'src/component/Button'
 import { ChallengerLogo } from 'src/component/ChallengerLogo'
 import { SignOutButton } from 'src/component/SignOutButton'
 

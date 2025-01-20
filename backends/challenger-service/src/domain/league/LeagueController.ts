@@ -1,5 +1,5 @@
 import { LeagueStatusValues, contract as rootContract } from '@f1-challenger/challenger-client'
-import { buildPaginationQuery } from '@f1-challenger/drizzle-utils'
+import { runQueryWithPagination } from '@f1-challenger/drizzle-utils'
 import { ForbiddenError, required } from '@f1-challenger/errors'
 import { BaseController, Endpoint, HandlerResult, HttpStatus, handler } from '@f1-challenger/nest-utils'
 import { buildPaginatedResponse, parsePagination } from '@f1-challenger/pagination'
@@ -26,11 +26,12 @@ export class LeagueController extends BaseController {
     return handler(contract.list, async ({ query }) => {
       const { adminUserId } = query
       const pagination: ListLeaguePagination = parsePagination(query, parseLeagueOrdering)
-      const { where, orderBy, limit } = buildPaginationQuery(leagueTable, pagination)
-      const leagues = await this.db.db().query.leagueTable.findMany({
-        where: and(adminUserId ? eq(leagueTable.adminUserId, adminUserId) : undefined, where),
-        orderBy,
-        limit,
+      const leagues = await runQueryWithPagination(pagination, leagueTable, ({ where, orderBy, limit }) => {
+        return this.db.db().query.leagueTable.findMany({
+          where: and(adminUserId ? eq(leagueTable.adminUserId, adminUserId) : undefined, where),
+          orderBy,
+          limit,
+        })
       })
       return {
         status: HttpStatus.OK,

@@ -11,9 +11,9 @@ import { Temporal } from '@js-temporal/polyfill'
 import { z } from 'zod'
 import { Post, TestDb, User } from '../test/TestDb'
 import { postTable, userTable } from '../test/testSchema'
-import { buildPaginationQuery } from './buildPaginationQuery'
+import { runQueryWithPagination } from './runQueryWithPagination'
 
-describe(buildPaginationQuery.name, () => {
+describe(runQueryWithPagination.name, () => {
   const baseTimestamp = Temporal.Instant.fromEpochSeconds(1_000_000)
   let user: User
   let posts: Post[]
@@ -49,20 +49,17 @@ describe(buildPaginationQuery.name, () => {
   })
 
   it('should fetch the first page, in ascending order', async () => {
-    const { where, orderBy, limit } = buildPaginationQuery(postTable, {
-      orderBy: 'sentAt',
-      orderDirection: OrderDirectionValues.asc,
-      limit: 3,
-    })
-    expect(where).toBeUndefined()
-    expect(orderBy).toBeDefined()
-    expect(limit).toBeDefined()
-
-    const foundPosts = await TestDb.db().query.postTable.findMany({
-      where,
-      orderBy,
-      limit,
-    })
+    const foundPosts = await runQueryWithPagination(
+      {
+        orderBy: 'sentAt',
+        orderDirection: OrderDirectionValues.asc,
+        limit: 3,
+      },
+      postTable,
+      async (pagination) => {
+        return TestDb.db().query.postTable.findMany(pagination)
+      }
+    )
 
     expect(foundPosts).toHaveLength(3)
     expect(foundPosts).toStrictEqual(posts.slice(0, 3))
@@ -70,43 +67,37 @@ describe(buildPaginationQuery.name, () => {
 
   it('should fetch the second page, in ascending order', async () => {
     const lastPostSeen = required(posts[2])
-    const { where, orderBy, limit } = buildPaginationQuery(postTable, {
-      orderBy: 'sentAt',
-      orderDirection: OrderDirectionValues.asc,
-      limit: 3,
-      lastOrderValueSeen: lastPostSeen.sentAt,
-      lastIdSeen: lastPostSeen.id,
-    })
 
-    expect(where).toBeDefined()
-    expect(orderBy).toBeDefined()
-    expect(limit).toBeDefined()
-
-    const foundPosts = await TestDb.db().query.postTable.findMany({
-      where,
-      orderBy,
-      limit,
-    })
+    const foundPosts = await runQueryWithPagination(
+      {
+        orderBy: 'sentAt',
+        orderDirection: OrderDirectionValues.asc,
+        limit: 3,
+        lastOrderValueSeen: lastPostSeen.sentAt,
+        lastIdSeen: lastPostSeen.id,
+      },
+      postTable,
+      async (pagination) => {
+        return TestDb.db().query.postTable.findMany(pagination)
+      }
+    )
 
     expect(foundPosts).toHaveLength(3)
     expect(foundPosts).toStrictEqual(posts.slice(3, 6))
   })
 
   it('should fetch the first page, in descending order', async () => {
-    const { where, orderBy, limit } = buildPaginationQuery(postTable, {
-      orderBy: 'sentAt',
-      orderDirection: OrderDirectionValues.desc,
-      limit: 3,
-    })
-    expect(where).toBeUndefined()
-    expect(orderBy).toBeDefined()
-    expect(limit).toBeDefined()
-
-    const foundPosts = await TestDb.db().query.postTable.findMany({
-      where,
-      orderBy,
-      limit,
-    })
+    const foundPosts = await runQueryWithPagination(
+      {
+        orderBy: 'sentAt',
+        orderDirection: OrderDirectionValues.desc,
+        limit: 3,
+      },
+      postTable,
+      async (pagination) => {
+        return TestDb.db().query.postTable.findMany(pagination)
+      }
+    )
 
     expect(foundPosts).toHaveLength(3)
     expect(foundPosts).toStrictEqual(posts.slice(-3).reverse())
@@ -114,23 +105,20 @@ describe(buildPaginationQuery.name, () => {
 
   it('should fetch the second page, in descending order', async () => {
     const lastPostSeen = required(posts[7])
-    const { where, orderBy, limit } = buildPaginationQuery(postTable, {
-      orderBy: 'sentAt',
-      orderDirection: OrderDirectionValues.desc,
-      limit: 3,
-      lastOrderValueSeen: lastPostSeen.sentAt,
-      lastIdSeen: lastPostSeen.id,
-    })
 
-    expect(where).toBeDefined()
-    expect(orderBy).toBeDefined()
-    expect(limit).toBeDefined()
-
-    const foundPosts = await TestDb.db().query.postTable.findMany({
-      where,
-      orderBy,
-      limit,
-    })
+    const foundPosts = await runQueryWithPagination(
+      {
+        orderBy: 'sentAt',
+        orderDirection: OrderDirectionValues.desc,
+        limit: 3,
+        lastOrderValueSeen: lastPostSeen.sentAt,
+        lastIdSeen: lastPostSeen.id,
+      },
+      postTable,
+      async (pagination) => {
+        return TestDb.db().query.postTable.findMany(pagination)
+      }
+    )
 
     expect(foundPosts).toHaveLength(3)
     expect(foundPosts).toStrictEqual(posts.slice(4, 7).reverse())
@@ -158,8 +146,9 @@ describe(buildPaginationQuery.name, () => {
 
       // Fetch first page (posts at index 0, 1, 2)
       const initalPagination = parsePagination(initalPaginationRequest, parsePostOrdering)
-      const initialQuery = buildPaginationQuery(postTable, initalPagination)
-      const initialPage = await TestDb.db().query.postTable.findMany(initialQuery)
+      const initialPage = await runQueryWithPagination(initalPagination, postTable, async (pagination) => {
+        return TestDb.db().query.postTable.findMany(pagination)
+      })
       expect(initialPage).toHaveLength(3)
       expect(initialPage).toStrictEqual(posts.slice(0, 3))
 
@@ -168,8 +157,9 @@ describe(buildPaginationQuery.name, () => {
       expect(initialPageResponse.pagination.next).toBeDefined()
       expect(initialPageResponse.pagination.previous).toBeDefined()
       const secondPagePagination = parsePagination({ cursor: initialPageResponse.pagination.next }, parsePostOrdering)
-      const secondPageQuery = buildPaginationQuery(postTable, secondPagePagination)
-      const secondPage = await TestDb.db().query.postTable.findMany(secondPageQuery)
+      const secondPage = await runQueryWithPagination(secondPagePagination, postTable, async (pagination) => {
+        return TestDb.db().query.postTable.findMany(pagination)
+      })
       expect(secondPage).toHaveLength(3)
       expect(secondPage).toStrictEqual(posts.slice(3, 6))
 
@@ -178,8 +168,9 @@ describe(buildPaginationQuery.name, () => {
       expect(secondPageResponse.pagination.next).toBeDefined()
       expect(secondPageResponse.pagination.previous).toBeDefined()
       const thirdPagePagination = parsePagination({ cursor: secondPageResponse.pagination.next }, parsePostOrdering)
-      const thirdPageQuery = buildPaginationQuery(postTable, thirdPagePagination)
-      const thirdPage = await TestDb.db().query.postTable.findMany(thirdPageQuery)
+      const thirdPage = await runQueryWithPagination(thirdPagePagination, postTable, async (pagination) => {
+        return TestDb.db().query.postTable.findMany(pagination)
+      })
       expect(thirdPage).toHaveLength(3)
       expect(thirdPage).toStrictEqual(posts.slice(6, 9))
 
@@ -188,8 +179,9 @@ describe(buildPaginationQuery.name, () => {
       expect(thirdPageResponse.pagination.next).toBeDefined()
       expect(thirdPageResponse.pagination.previous).toBeDefined()
       const fourthPagePagination = parsePagination({ cursor: thirdPageResponse.pagination.next }, parsePostOrdering)
-      const fourthPageQuery = buildPaginationQuery(postTable, fourthPagePagination)
-      const fourthPage = await TestDb.db().query.postTable.findMany(fourthPageQuery)
+      const fourthPage = await runQueryWithPagination(fourthPagePagination, postTable, async (pagination) => {
+        return TestDb.db().query.postTable.findMany(pagination)
+      })
       expect(fourthPage).toHaveLength(1)
       expect(fourthPage).toStrictEqual(posts.slice(9))
 
@@ -198,8 +190,9 @@ describe(buildPaginationQuery.name, () => {
       expect(fourthPageResponse.pagination.next).toBeDefined()
       expect(fourthPageResponse.pagination.previous).toBeDefined()
       const fifthPagePagination = parsePagination({ cursor: fourthPageResponse.pagination.next }, parsePostOrdering)
-      const fifthPageQuery = buildPaginationQuery(postTable, fifthPagePagination)
-      const fifthPage = await TestDb.db().query.postTable.findMany(fifthPageQuery)
+      const fifthPage = await runQueryWithPagination(fifthPagePagination, postTable, async (pagination) => {
+        return TestDb.db().query.postTable.findMany(pagination)
+      })
       expect(fifthPage).toHaveLength(0)
 
       // Fetch previous from fourth page
@@ -207,44 +200,65 @@ describe(buildPaginationQuery.name, () => {
         { cursor: fourthPageResponse.pagination.previous },
         parsePostOrdering
       )
-      const oneBackFromFourthPageQuery = buildPaginationQuery(postTable, oneBackFromFourthPagePagination)
-      const oneBackFromFourthPage = await TestDb.db().query.postTable.findMany(oneBackFromFourthPageQuery)
+      const oneBackFromFourthPage = await runQueryWithPagination(
+        oneBackFromFourthPagePagination,
+        postTable,
+        async (pagination) => {
+          return TestDb.db().query.postTable.findMany(pagination)
+        }
+      )
       expect(oneBackFromFourthPage).toHaveLength(3)
-      expect(oneBackFromFourthPage).toStrictEqual(posts.slice(6, 9).reverse())
+      expect(oneBackFromFourthPage).toStrictEqual(thirdPage)
 
       // Continue backwards
       const twoBackFromFourthPagePagination = parsePagination(
         {
-          cursor: buildPaginatedResponse(oneBackFromFourthPage, oneBackFromFourthPagePagination).pagination.next,
+          cursor: buildPaginatedResponse(oneBackFromFourthPage, oneBackFromFourthPagePagination).pagination.previous,
         },
         parsePostOrdering
       )
-      const twoBackFromFourthPageQuery = buildPaginationQuery(postTable, twoBackFromFourthPagePagination)
-      const twoBackFromFourthPage = await TestDb.db().query.postTable.findMany(twoBackFromFourthPageQuery)
+      const twoBackFromFourthPage = await runQueryWithPagination(
+        twoBackFromFourthPagePagination,
+        postTable,
+        async (pagination) => {
+          return TestDb.db().query.postTable.findMany(pagination)
+        }
+      )
       expect(twoBackFromFourthPage).toHaveLength(3)
-      expect(twoBackFromFourthPage).toStrictEqual(posts.slice(3, 6).reverse())
+      expect(twoBackFromFourthPage).toStrictEqual(secondPage)
 
       // Continue backwards
       const threeBackFromFourthPagePagination = parsePagination(
         {
-          cursor: buildPaginatedResponse(twoBackFromFourthPage, twoBackFromFourthPagePagination).pagination.next,
+          cursor: buildPaginatedResponse(twoBackFromFourthPage, twoBackFromFourthPagePagination).pagination.previous,
         },
         parsePostOrdering
       )
-      const threeBackFromFourthPageQuery = buildPaginationQuery(postTable, threeBackFromFourthPagePagination)
-      const threeBackFromFourthPage = await TestDb.db().query.postTable.findMany(threeBackFromFourthPageQuery)
+      const threeBackFromFourthPage = await runQueryWithPagination(
+        threeBackFromFourthPagePagination,
+        postTable,
+        async (pagination) => {
+          return TestDb.db().query.postTable.findMany(pagination)
+        }
+      )
       expect(threeBackFromFourthPage).toHaveLength(3)
-      expect(threeBackFromFourthPage).toStrictEqual(posts.slice(0, 3).reverse())
+      expect(threeBackFromFourthPage).toStrictEqual(initialPage)
 
       // Continue backwards
       const fourBackFromFourthPagePagination = parsePagination(
         {
-          cursor: buildPaginatedResponse(threeBackFromFourthPage, threeBackFromFourthPagePagination).pagination.next,
+          cursor: buildPaginatedResponse(threeBackFromFourthPage, threeBackFromFourthPagePagination).pagination
+            .previous,
         },
         parsePostOrdering
       )
-      const fourBackFromFourthPageQuery = buildPaginationQuery(postTable, fourBackFromFourthPagePagination)
-      const fourBackFromFourthPage = await TestDb.db().query.postTable.findMany(fourBackFromFourthPageQuery)
+      const fourBackFromFourthPage = await runQueryWithPagination(
+        fourBackFromFourthPagePagination,
+        postTable,
+        async (pagination) => {
+          return TestDb.db().query.postTable.findMany(pagination)
+        }
+      )
       expect(fourBackFromFourthPage).toHaveLength(0)
     })
 
@@ -257,8 +271,9 @@ describe(buildPaginationQuery.name, () => {
 
       // Fetch first page (posts at index 9, 8, 7)
       const initalPagination = parsePagination(initalPaginationRequest, parsePostOrdering)
-      const initialQuery = buildPaginationQuery(postTable, initalPagination)
-      const initialPage = await TestDb.db().query.postTable.findMany(initialQuery)
+      const initialPage = await runQueryWithPagination(initalPagination, postTable, async (pagination) => {
+        return TestDb.db().query.postTable.findMany(pagination)
+      })
       expect(initialPage).toHaveLength(3)
       expect(initialPage).toStrictEqual(posts.slice(-3).reverse())
 
@@ -267,8 +282,9 @@ describe(buildPaginationQuery.name, () => {
       expect(initialPageResponse.pagination.next).toBeDefined()
       expect(initialPageResponse.pagination.previous).toBeDefined()
       const secondPagePagination = parsePagination({ cursor: initialPageResponse.pagination.next }, parsePostOrdering)
-      const secondPageQuery = buildPaginationQuery(postTable, secondPagePagination)
-      const secondPage = await TestDb.db().query.postTable.findMany(secondPageQuery)
+      const secondPage = await runQueryWithPagination(secondPagePagination, postTable, async (pagination) => {
+        return TestDb.db().query.postTable.findMany(pagination)
+      })
       expect(secondPage).toHaveLength(3)
       expect(secondPage).toStrictEqual(posts.slice(4, 7).reverse())
 
@@ -277,8 +293,9 @@ describe(buildPaginationQuery.name, () => {
       expect(secondPageResponse.pagination.next).toBeDefined()
       expect(secondPageResponse.pagination.previous).toBeDefined()
       const thirdPagePagination = parsePagination({ cursor: secondPageResponse.pagination.next }, parsePostOrdering)
-      const thirdPageQuery = buildPaginationQuery(postTable, thirdPagePagination)
-      const thirdPage = await TestDb.db().query.postTable.findMany(thirdPageQuery)
+      const thirdPage = await runQueryWithPagination(thirdPagePagination, postTable, async (pagination) => {
+        return TestDb.db().query.postTable.findMany(pagination)
+      })
       expect(thirdPage).toHaveLength(3)
       expect(thirdPage).toStrictEqual(posts.slice(1, 4).reverse())
 
@@ -287,8 +304,9 @@ describe(buildPaginationQuery.name, () => {
       expect(thirdPageResponse.pagination.next).toBeDefined()
       expect(thirdPageResponse.pagination.previous).toBeDefined()
       const fourthPagePagination = parsePagination({ cursor: thirdPageResponse.pagination.next }, parsePostOrdering)
-      const fourthPageQuery = buildPaginationQuery(postTable, fourthPagePagination)
-      const fourthPage = await TestDb.db().query.postTable.findMany(fourthPageQuery)
+      const fourthPage = await runQueryWithPagination(fourthPagePagination, postTable, async (pagination) => {
+        return TestDb.db().query.postTable.findMany(pagination)
+      })
       expect(fourthPage).toHaveLength(1)
       expect(fourthPage).toStrictEqual(posts.slice(0, 1).reverse())
 
@@ -297,57 +315,78 @@ describe(buildPaginationQuery.name, () => {
       expect(fourthPageResponse.pagination.next).toBeDefined()
       expect(fourthPageResponse.pagination.previous).toBeDefined()
       const fifthPagePagination = parsePagination({ cursor: fourthPageResponse.pagination.next }, parsePostOrdering)
-      const fifthPageQuery = buildPaginationQuery(postTable, fifthPagePagination)
-      const fifthPage = await TestDb.db().query.postTable.findMany(fifthPageQuery)
+      const fifthPage = await runQueryWithPagination(fifthPagePagination, postTable, async (pagination) => {
+        return TestDb.db().query.postTable.findMany(pagination)
+      })
       expect(fifthPage).toHaveLength(0)
 
       // Fetch previous from fourth page
-      const oneForwardsFromFourthPagePagination = parsePagination(
+      const oneBackwardsFromFourthPagePagination = parsePagination(
         { cursor: fourthPageResponse.pagination.previous },
         parsePostOrdering
       )
-      const oneForwardsFromFourthPageQuery = buildPaginationQuery(postTable, oneForwardsFromFourthPagePagination)
-      const oneForwardsFromFourthPage = await TestDb.db().query.postTable.findMany(oneForwardsFromFourthPageQuery)
-      expect(oneForwardsFromFourthPage).toHaveLength(3)
-      expect(oneForwardsFromFourthPage).toStrictEqual(posts.slice(1, 4))
+      const oneBackwardsFromFourthPage = await runQueryWithPagination(
+        oneBackwardsFromFourthPagePagination,
+        postTable,
+        async (pagination) => {
+          return TestDb.db().query.postTable.findMany(pagination)
+        }
+      )
+      expect(oneBackwardsFromFourthPage).toHaveLength(3)
+      expect(oneBackwardsFromFourthPage).toStrictEqual(thirdPage)
 
-      // Continue forwards
-      const twoForwardsFromFourthPagePagination = parsePagination(
+      // Continue backwards
+      const twoBackwardsFromFourthPagePagination = parsePagination(
         {
-          cursor: buildPaginatedResponse(oneForwardsFromFourthPage, oneForwardsFromFourthPagePagination).pagination
-            .next,
+          cursor: buildPaginatedResponse(oneBackwardsFromFourthPage, oneBackwardsFromFourthPagePagination).pagination
+            .previous,
         },
         parsePostOrdering
       )
-      const twoForwardsFromFourthPageQuery = buildPaginationQuery(postTable, twoForwardsFromFourthPagePagination)
-      const twoForwardsFromFourthPage = await TestDb.db().query.postTable.findMany(twoForwardsFromFourthPageQuery)
-      expect(twoForwardsFromFourthPage).toHaveLength(3)
-      expect(twoForwardsFromFourthPage).toStrictEqual(posts.slice(4, 7))
+      const twoBackwardsFromFourthPage = await runQueryWithPagination(
+        twoBackwardsFromFourthPagePagination,
+        postTable,
+        async (pagination) => {
+          return TestDb.db().query.postTable.findMany(pagination)
+        }
+      )
+      expect(twoBackwardsFromFourthPage).toHaveLength(3)
+      expect(twoBackwardsFromFourthPage).toStrictEqual(secondPage)
 
-      // Continue forwards
-      const threeForwardsFromFourthPagePagination = parsePagination(
+      // Continue backwards
+      const threeBackwardsFromFourthPagePagination = parsePagination(
         {
-          cursor: buildPaginatedResponse(twoForwardsFromFourthPage, twoForwardsFromFourthPagePagination).pagination
-            .next,
+          cursor: buildPaginatedResponse(twoBackwardsFromFourthPage, twoBackwardsFromFourthPagePagination).pagination
+            .previous,
         },
         parsePostOrdering
       )
-      const threeForwardsFromFourthPageQuery = buildPaginationQuery(postTable, threeForwardsFromFourthPagePagination)
-      const threeForwardsFromFourthPage = await TestDb.db().query.postTable.findMany(threeForwardsFromFourthPageQuery)
-      expect(threeForwardsFromFourthPage).toHaveLength(3)
-      expect(threeForwardsFromFourthPage).toStrictEqual(posts.slice(7, 10))
+      const threeBackwardsFromFourthPage = await runQueryWithPagination(
+        threeBackwardsFromFourthPagePagination,
+        postTable,
+        async (pagination) => {
+          return TestDb.db().query.postTable.findMany(pagination)
+        }
+      )
+      expect(threeBackwardsFromFourthPage).toHaveLength(3)
+      expect(threeBackwardsFromFourthPage).toStrictEqual(initialPage)
 
-      // Continue forwards
-      const fourForwardsFromFourthPagePagination = parsePagination(
+      // Continue backwards
+      const fourBackwardsFromFourthPagePagination = parsePagination(
         {
-          cursor: buildPaginatedResponse(threeForwardsFromFourthPage, threeForwardsFromFourthPagePagination).pagination
-            .next,
+          cursor: buildPaginatedResponse(threeBackwardsFromFourthPage, threeBackwardsFromFourthPagePagination)
+            .pagination.previous,
         },
         parsePostOrdering
       )
-      const fourForwardsFromFourthPageQuery = buildPaginationQuery(postTable, fourForwardsFromFourthPagePagination)
-      const fourForwardsFromFourthPage = await TestDb.db().query.postTable.findMany(fourForwardsFromFourthPageQuery)
-      expect(fourForwardsFromFourthPage).toHaveLength(0)
+      const fourBackwardsFromFourthPage = await runQueryWithPagination(
+        fourBackwardsFromFourthPagePagination,
+        postTable,
+        async (pagination) => {
+          return TestDb.db().query.postTable.findMany(pagination)
+        }
+      )
+      expect(fourBackwardsFromFourthPage).toHaveLength(0)
     })
   })
 })
