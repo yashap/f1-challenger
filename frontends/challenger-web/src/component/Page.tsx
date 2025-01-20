@@ -8,7 +8,7 @@ interface PageProps {
 
 export const Page = ({ children }: PageProps) => {
   return (
-    <Container>
+    <Container sx={{ minWidth: '600px' }}>
       <MainNavBar />
       {children}
     </Container>

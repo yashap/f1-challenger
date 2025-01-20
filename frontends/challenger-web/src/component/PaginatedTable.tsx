@@ -42,6 +42,7 @@ interface Props<T extends GridValidRowModel, Q extends PaginationRequestDto> {
   columns: GridColDef<T>[]
   queryKey: QueryKey
   fetchPage: (queryParams: Q) => Promise<PaginatedResponseDto<T>>
+  onRowClick?: (row: T) => void
   initialOrdering?: Ordering
   initalPageSize?: number
   pageSizes?: readonly number[]
@@ -52,6 +53,7 @@ export const PaginatedTable = <T extends GridValidRowModel, Q extends Pagination
   columns,
   queryKey,
   fetchPage,
+  onRowClick,
   initalPageSize,
   initialOrdering = defaultInitialOrdering,
   pageSizes = defaultPageSizes,
@@ -113,7 +115,19 @@ export const PaginatedTable = <T extends GridValidRowModel, Q extends Pagination
         }}
         columns={columnsWithDefaults}
         pageSizeOptions={pageSizes}
-        sx={{ border: 0 }}
+        sx={{
+          border: 0,
+          ...(onRowClick && {
+            // disable cell selection style
+            '.MuiDataGrid-cell:focus': {
+              outline: 'none',
+            },
+            // pointer cursor on ALL rows
+            '& .MuiDataGrid-row:hover': {
+              cursor: 'pointer',
+            },
+          }),
+        }}
         paginationMode='server'
         paginationModel={paginationModel}
         onPaginationModelChange={(newPage: GridPaginationModel) => {
@@ -148,6 +162,13 @@ export const PaginatedTable = <T extends GridValidRowModel, Q extends Pagination
         }}
         rowCount={rowCount}
         sortingOrder={[OrderDirectionValues.asc, OrderDirectionValues.desc]}
+        onRowClick={
+          onRowClick
+            ? ({ row }) => {
+                onRowClick(row as T)
+              }
+            : undefined
+        }
       />
     </Container>
   )

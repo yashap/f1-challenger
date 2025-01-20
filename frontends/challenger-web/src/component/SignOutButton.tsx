@@ -1,7 +1,7 @@
-import { Button } from '@mui/material'
 import React from 'react'
 import { NavigateFunction, useNavigate } from 'react-router'
 import { signOut } from 'supertokens-web-js/recipe/session'
+import { Button } from 'src/component/Button'
 
 const onSignOutClicked = async (navigate: NavigateFunction) => {
   await signOut()
@@ -12,7 +12,6 @@ export const SignOutButton = () => {
   const navigate = useNavigate()
   return (
     <Button
-      variant='contained'
       onClick={() => {
         void onSignOutClicked(navigate)
       }}

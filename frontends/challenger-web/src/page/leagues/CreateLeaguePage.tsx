@@ -1,7 +1,8 @@
-import { Button, TextField, Typography } from '@mui/material'
+import { TextField, Typography } from '@mui/material'
 import React, { FormEvent, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { ChallengerClientBuilder } from 'src/apiClient/ChallengerClientBuilder'
+import { Button } from 'src/component/Button'
 import { Page } from 'src/component/Page'
 
 interface FormData {
@@ -58,7 +59,7 @@ export const CreateLeaguePage = () => {
             setFormData({ ...formData, description: event.target.value })
           }}
         />
-        <Button variant='contained' color='primary' type='submit'>
+        <Button color='primary' type='submit'>
           Submit
         </Button>
       </form>

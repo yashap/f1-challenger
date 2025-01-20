@@ -2,6 +2,7 @@ import { LeagueDto, LeagueStatusValues } from '@f1-challenger/challenger-client'
 import { Temporal } from '@js-temporal/polyfill'
 import { GridColDef } from '@mui/x-data-grid'
 import React, { useMemo } from 'react'
+import { useNavigate } from 'react-router'
 import { ChallengerClientBuilder } from 'src/apiClient/ChallengerClientBuilder'
 import { PaginatedTable } from 'src/component/PaginatedTable'
 
@@ -35,12 +36,16 @@ const columns: GridColDef<LeagueDto>[] = [
 
 export const LeagueTable = () => {
   const client = useMemo(() => ChallengerClientBuilder.build(), [])
+  const navigate = useNavigate()
   return (
     <PaginatedTable
       columns={columns}
       queryKey={['leagues.listPage', client]}
       fetchPage={(queryParams) => client.leagues.listPage(queryParams)}
       pageSizes={[5, 10, 20]}
+      onRowClick={(league) => {
+        void navigate(`/leagues/${league.id}`)
+      }}
     />
   )
 }

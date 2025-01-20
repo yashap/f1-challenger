@@ -1,6 +1,7 @@
-import { Button, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import React from 'react'
 import { Link } from 'react-router'
+import { Button } from 'src/component/Button'
 import { Page } from 'src/component/Page'
 import { LeagueTable } from 'src/page/leagues/component/LeagueTable'
 
@@ -9,7 +10,7 @@ export const LeaguesPage = () => (
     <Typography variant='h4'>Leagues</Typography>
     <LeagueTable />
     <Link to='/leagues/new'>
-      <Button variant='contained' color='primary' type='submit'>
+      <Button type='submit'>
         Create League
       </Button>
     </Link>
