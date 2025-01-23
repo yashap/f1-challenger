@@ -7,7 +7,7 @@ const c = initContract()
 export const contract = c.router(
   {
     leagues: leagueContract,
-    leagueMember: leagueMemberContract,
+    leagueMembers: leagueMemberContract,
   },
   {
     strictStatusCodes: true,

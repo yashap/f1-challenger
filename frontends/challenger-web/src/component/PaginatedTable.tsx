@@ -5,10 +5,11 @@ import {
   PaginatedResponseDto,
   PaginationRequestDto,
 } from '@f1-challenger/pagination'
-import { Container } from '@mui/material'
+import { Container, SxProps, Theme, useTheme } from '@mui/material'
 import { DataGrid, GridColDef, GridPaginationModel, GridSortItem, GridValidRowModel } from '@mui/x-data-grid'
 import { QueryKey, useQuery } from '@tanstack/react-query'
 import React, { useMemo, useState } from 'react'
+import { border } from 'src/component/border'
 import { CenteringContainer } from 'src/component/CenteringContainer'
 import { ErrorContent } from 'src/component/ErrorContent'
 
@@ -46,6 +47,7 @@ interface Props<T extends GridValidRowModel, Q extends PaginationRequestDto> {
   initialOrdering?: Ordering
   initalPageSize?: number
   pageSizes?: readonly number[]
+  sx?: SxProps<Theme>
   // TODO: support default filter
 }
 
@@ -54,10 +56,12 @@ export const PaginatedTable = <T extends GridValidRowModel, Q extends Pagination
   queryKey,
   fetchPage,
   onRowClick,
+  sx,
   initalPageSize,
   initialOrdering = defaultInitialOrdering,
   pageSizes = defaultPageSizes,
 }: Props<T, Q>) => {
+  const theme = useTheme()
   const columnsWithDefaults = useMemo(() => columns.map((column) => ({ ...columnDefaults, ...column })), [columns])
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
@@ -116,7 +120,10 @@ export const PaginatedTable = <T extends GridValidRowModel, Q extends Pagination
         columns={columnsWithDefaults}
         pageSizeOptions={pageSizes}
         sx={{
-          border: 0,
+          '.MuiDataGrid-row, .MuiDataGrid-footerContainer': {
+            backgroundColor: 'white',
+          },
+          ...border(theme),
           ...(onRowClick && {
             // disable cell selection style
             '.MuiDataGrid-cell:focus': {
@@ -127,6 +134,7 @@ export const PaginatedTable = <T extends GridValidRowModel, Q extends Pagination
               cursor: 'pointer',
             },
           }),
+          ...sx,
         }}
         paginationMode='server'
         paginationModel={paginationModel}

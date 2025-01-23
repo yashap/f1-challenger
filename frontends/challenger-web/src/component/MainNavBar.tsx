@@ -4,6 +4,7 @@ import { alpha, styled } from '@mui/material/styles'
 import Toolbar from '@mui/material/Toolbar'
 import React from 'react'
 import { Link } from 'react-router'
+import { border } from 'src/component/border'
 import { Button } from 'src/component/Button'
 import { ChallengerLogo } from 'src/component/ChallengerLogo'
 import { SignOutButton } from 'src/component/SignOutButton'
@@ -13,14 +14,12 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   flexShrink: 0,
-  borderRadius: `calc(${theme.shape.borderRadius}px + 8px)`,
   backdropFilter: 'blur(24px)',
-  border: '1px solid',
-  borderColor: theme.palette.divider,
   backgroundColor: alpha(theme.palette.background.default, 0.4),
-  boxShadow: theme.shadows[1],
   padding: '8px 12px',
   margin: '10px 0 18px 0',
+  ...border(theme),
+  borderRadius: `calc(${theme.shape.borderRadius}px + 8px)`,
 }))
 
 const LogoContainer = styled('div')(() => ({

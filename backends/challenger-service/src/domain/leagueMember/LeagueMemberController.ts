@@ -16,7 +16,7 @@ import {
   parseLeagueMemberOrdering,
 } from 'src/domain/leagueMember/LeagueMember'
 
-const contract = rootContract.leagueMember
+const contract = rootContract.leagueMembers
 
 @Controller()
 export class LeagueMemberController extends BaseController {

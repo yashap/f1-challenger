@@ -48,6 +48,7 @@ export const CreateLeaguePage = () => {
           onChange={(event) => {
             setFormData({ ...formData, name: event.target.value })
           }}
+          sx={{ backgroundColor: 'white' }}
           required
         />
         <TextField
@@ -58,6 +59,7 @@ export const CreateLeaguePage = () => {
           onChange={(event) => {
             setFormData({ ...formData, description: event.target.value })
           }}
+          sx={{ backgroundColor: 'white' }}
         />
         <Button color='primary' type='submit'>
           Submit

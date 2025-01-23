@@ -10,9 +10,10 @@ import { AuthModule, SuperTokensExceptionFilter } from 'src/auth'
 import { config } from 'src/config'
 import { LeagueModule } from 'src/domain/league'
 import { Logger } from '@f1-challenger/logging'
+import { LeagueMemberModule } from 'src/domain/leagueMember'
 
 @Module({
-  imports: [LeagueModule, AuthModule.forRoot(config.auth)],
+  imports: [LeagueModule, LeagueMemberModule, AuthModule.forRoot(config.auth)],
 })
 class AppModule {}
 

@@ -12,7 +12,7 @@ export const AsyncContent = ({ status, error, children }: Props): JSX.Element =>
     return <LoadingSpinner />
   }
   if (status === 'error') {
-    return <ErrorContent error={error ?? 'Something went wrong'} />
+    return <ErrorContent error={error ?? 'Something went wrong'} sx={{ pt: 2, pb: 2 }} />
   }
 
   return <>{children}</>
