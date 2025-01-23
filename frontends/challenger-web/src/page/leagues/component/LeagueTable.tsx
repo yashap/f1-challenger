@@ -1,5 +1,6 @@
 import { LeagueDto, LeagueStatusValues } from '@f1-challenger/challenger-client'
 import { Temporal } from '@js-temporal/polyfill'
+import { SxProps, Theme } from '@mui/material'
 import { GridColDef } from '@mui/x-data-grid'
 import React, { useMemo } from 'react'
 import { useNavigate } from 'react-router'
@@ -34,7 +35,11 @@ const columns: GridColDef<LeagueDto>[] = [
   },
 ]
 
-export const LeagueTable = () => {
+interface Props {
+  sx?: SxProps<Theme>
+}
+
+export const LeagueTable = ({ sx }: Props) => {
   const client = useMemo(() => ChallengerClientBuilder.build(), [])
   const navigate = useNavigate()
   return (
@@ -46,6 +51,7 @@ export const LeagueTable = () => {
       onRowClick={(league) => {
         void navigate(`/leagues/${league.id}`)
       }}
+      sx={sx}
     />
   )
 }

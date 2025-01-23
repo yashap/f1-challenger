@@ -57,21 +57,21 @@ export class ChallengerClient {
       return extractDeleteResponse(this.client.leagues.delete({ params: { id } }))
     },
   }
-  public readonly leagueMember = {
+  public readonly leagueMembers = {
     listPage: (request: ListLeagueMemberRequest): Promise<ListLeagueMemberResponse> => {
-      return extractListResponse(this.client.leagueMember.list({ query: request }))
+      return extractListResponse(this.client.leagueMembers.list({ query: request }))
     },
     listAllPages: async (request: Omit<ListLeagueMemberRequest, 'cursor'>): Promise<LeagueMemberDto[]> => {
-      return fetchAllPages({ limit: DEFAULT_LIMIT, ...request }, (req) => this.leagueMember.listPage(req))
+      return fetchAllPages({ limit: DEFAULT_LIMIT, ...request }, (req) => this.leagueMembers.listPage(req))
     },
     create: (request: CreateLeagueMemberRequest): Promise<LeagueMemberDto> => {
-      return extractPostResponse(this.client.leagueMember.post({ body: request }))
+      return extractPostResponse(this.client.leagueMembers.post({ body: request }))
     },
     get: (id: string): Promise<LeagueMemberDto | undefined> => {
-      return extractGetByIdResponse(this.client.leagueMember.get({ params: { id } }))
+      return extractGetByIdResponse(this.client.leagueMembers.get({ params: { id } }))
     },
     delete: (request: DeleteLeagueMemberRequest): Promise<void> => {
-      return extractDeleteResponse(this.client.leagueMember.delete({ body: request }))
+      return extractDeleteResponse(this.client.leagueMembers.delete({ body: request }))
     },
   }
 }
