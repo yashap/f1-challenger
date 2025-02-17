@@ -6,7 +6,7 @@ import { useChallengerClient } from 'src/apiClient/useChallengerClient'
 import { AsyncContent } from 'src/component/AsyncContent'
 import { Field, Fields } from 'src/component/Field'
 import { Page } from 'src/component/Page'
-import { LeagueMemberTable } from 'src/page/leagues/component/LeagueMemberTable'
+import { TeamTable } from 'src/page/leagues/component/TeamTable'
 
 export const LeaguePage = () => {
   const { id } = useParams<{ id: string }>()
@@ -48,7 +48,7 @@ export const LeaguePage = () => {
       <Typography variant='h4' sx={{ mt: 3 }}>
         Teams
       </Typography>
-      <LeagueMemberTable leagueId={id} sx={{ mt: 1, mb: 1 }} />
+      <TeamTable leagueId={id} sx={{ mt: 1, mb: 1 }} />
     </Page>
   )
 }

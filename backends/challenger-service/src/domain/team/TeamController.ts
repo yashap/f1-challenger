@@ -8,20 +8,15 @@ import { and, eq } from 'drizzle-orm'
 import { SessionContainer } from 'supertokens-node/recipe/session'
 import { AuthGuard, Session } from 'src/auth'
 import { Db } from 'src/db/Db'
-import { leagueMemberTable, leagueTable } from 'src/db/schema'
-import {
-  LeagueMember,
-  leagueMemberToDto,
-  ListLeagueMemberPagination,
-  parseLeagueMemberOrdering,
-} from 'src/domain/leagueMember/LeagueMember'
+import { teamTable, leagueTable } from 'src/db/schema'
+import { Team, teamToDto, ListTeamPagination, parseTeamOrdering } from 'src/domain/team/Team'
 
-const contract = rootContract.leagueMembers
+const contract = rootContract.teams
 
 @Controller()
-export class LeagueMemberController extends BaseController {
+export class TeamController extends BaseController {
   constructor(private readonly db: Db) {
-    super('LeagueMember')
+    super('Team')
   }
 
   @Endpoint(contract.list)
@@ -29,12 +24,12 @@ export class LeagueMemberController extends BaseController {
   public list(@Session() _session: SessionContainer): HandlerResult<typeof contract.list> {
     return handler(contract.list, async ({ query }) => {
       const { userId, leagueId } = query
-      const pagination: ListLeagueMemberPagination = parsePagination(query, parseLeagueMemberOrdering)
-      const leagueMembers = await runQueryWithPagination(pagination, leagueMemberTable, ({ where, orderBy, limit }) => {
-        return this.db.db().query.leagueMemberTable.findMany({
+      const pagination: ListTeamPagination = parsePagination(query, parseTeamOrdering)
+      const teams = await runQueryWithPagination(pagination, teamTable, ({ where, orderBy, limit }) => {
+        return this.db.db().query.teamTable.findMany({
           where: and(
-            leagueId ? eq(leagueMemberTable.leagueId, leagueId) : undefined,
-            and(userId ? eq(leagueMemberTable.userId, userId) : undefined),
+            leagueId ? eq(teamTable.leagueId, leagueId) : undefined,
+            and(userId ? eq(teamTable.userId, userId) : undefined),
             where
           ),
           orderBy,
@@ -43,7 +38,7 @@ export class LeagueMemberController extends BaseController {
       })
       return {
         status: HttpStatus.OK,
-        body: buildPaginatedResponse(leagueMembers.map(leagueMemberToDto), pagination),
+        body: buildPaginatedResponse(teams.map(teamToDto), pagination),
       }
     })
   }
@@ -54,14 +49,14 @@ export class LeagueMemberController extends BaseController {
     return handler(contract.post, async ({ body }) => {
       const result = await this.db
         .db()
-        .insert(leagueMemberTable)
+        .insert(teamTable)
         .values({
           ...body,
           userId: session.getUserId(),
         })
         .returning()
-      const leagueMember = required(result[0])
-      return { status: HttpStatus.CREATED, body: leagueMemberToDto(leagueMember) }
+      const team = required(result[0])
+      return { status: HttpStatus.CREATED, body: teamToDto(team) }
     })
   }
 
@@ -69,10 +64,10 @@ export class LeagueMemberController extends BaseController {
   @UseGuards(new AuthGuard())
   public getById(@Session() _session: SessionContainer): HandlerResult<typeof contract.get> {
     return handler(contract.get, async ({ params: { id } }) => {
-      const maybeLeagueMember = await this.db.db().query.leagueMemberTable.findFirst({
-        where: eq(leagueMemberTable.id, id),
+      const maybeTeam = await this.db.db().query.teamTable.findFirst({
+        where: eq(teamTable.id, id),
       })
-      return { status: HttpStatus.OK, body: leagueMemberToDto(this.getEntityOrNotFound(maybeLeagueMember)) }
+      return { status: HttpStatus.OK, body: teamToDto(this.getEntityOrNotFound(maybeTeam)) }
     })
   }
 
@@ -80,30 +75,26 @@ export class LeagueMemberController extends BaseController {
   @UseGuards(new AuthGuard())
   public delete(@Session() session: SessionContainer): HandlerResult<typeof contract.delete> {
     return handler(contract.delete, async ({ body }) => {
-      const leagueMember = await this.getAndVerifyOwnership(body.leagueId, body.userId, session.getUserId())
-      await this.db.db().delete(leagueMemberTable).where(eq(leagueMemberTable.id, leagueMember.id))
+      const team = await this.getAndVerifyOwnership(body.leagueId, body.userId, session.getUserId())
+      await this.db.db().delete(teamTable).where(eq(teamTable.id, team.id))
       return { status: HttpStatus.NO_CONTENT, body: undefined }
     })
   }
 
-  private async getAndVerifyOwnership(
-    leagueId: string,
-    userId: string,
-    userPerformingAction: string
-  ): Promise<LeagueMember> {
+  private async getAndVerifyOwnership(leagueId: string, userId: string, userPerformingAction: string): Promise<Team> {
     const maybeLeague = await this.db.db().query.leagueTable.findFirst({
       where: eq(leagueTable.id, leagueId),
     })
-    const maybeLeagueMember = await this.db.db().query.leagueMemberTable.findFirst({
-      where: and(eq(leagueMemberTable.leagueId, leagueId), eq(leagueMemberTable.userId, userId)),
+    const maybeTeam = await this.db.db().query.teamTable.findFirst({
+      where: and(eq(teamTable.leagueId, leagueId), eq(teamTable.userId, userId)),
     })
     const league = this.getEntityOrNotFound(maybeLeague)
-    const leagueMember = this.getEntityOrNotFound(maybeLeagueMember)
+    const team = this.getEntityOrNotFound(maybeTeam)
     const isAdmin = league.adminUserId === userPerformingAction
     const isActingOnSelf = userId !== userPerformingAction
     if (!isAdmin && !isActingOnSelf) {
       throw new ForbiddenError('Forbidden as non-admin members cannot modify any other members but yourself.')
     }
-    return leagueMember
+    return team
   }
 }

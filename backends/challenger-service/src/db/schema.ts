@@ -18,7 +18,7 @@ export const leagueTable = pgTable(
 )
 
 export const leagueRelations = relations(leagueTable, ({ many }) => ({
-  members: many(leagueMemberTable),
+  members: many(teamTable),
 }))
 
 // 'AcceptingUsers', 'Started'
@@ -26,8 +26,8 @@ export const _values_league_Status = pgTable('values_League_status', {
   status: text().primaryKey(),
 })
 
-export const leagueMemberTable = pgTable(
-  'LeagueMember',
+export const teamTable = pgTable(
+  'Team',
   {
     ...standardFields,
     leagueId: uuid()
@@ -35,5 +35,5 @@ export const leagueMemberTable = pgTable(
       .references(() => leagueTable.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
     userId: uuid().notNull(),
   },
-  (table) => [index('LeagueMember_leagueId_idx').on(table.leagueId), index('LeagueMember_userId_idx').on(table.userId)]
+  (table) => [index('Team_leagueId_idx').on(table.leagueId), index('Team_userId_idx').on(table.userId)]
 )
