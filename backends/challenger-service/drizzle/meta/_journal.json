@@ -29,6 +29,20 @@
       "when": 1735594966680,
       "tag": "0003_add_leagueMemberTable",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1739834710570,
+      "tag": "0004_change_league_member_to_team",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1739835548603,
+      "tag": "0005_add_team_name",
+      "breakpoints": true
     }
   ]
 }

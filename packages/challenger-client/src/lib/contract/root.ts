@@ -1,13 +1,13 @@
 import { initContract } from '@ts-rest/core'
 import { leagueContract } from './league'
-import { leagueMemberContract } from './leagueMember'
+import { teamContract } from './team'
 
 const c = initContract()
 
 export const contract = c.router(
   {
     leagues: leagueContract,
-    leagueMembers: leagueMemberContract,
+    teams: teamContract,
   },
   {
     strictStatusCodes: true,

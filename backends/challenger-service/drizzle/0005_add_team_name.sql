@@ -1,0 +1,1 @@
+ALTER TABLE "Team" ADD COLUMN "name" text NOT NULL;

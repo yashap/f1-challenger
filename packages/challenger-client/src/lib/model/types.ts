@@ -8,27 +8,27 @@ import {
   LeagueStatusSchema,
 } from './League'
 import {
-  CreateLeagueMemberRequestSchema,
-  ListLeagueMemberResponseSchema,
-  ListLeagueMemberRequestSchema,
-  LeagueMemberSchema,
-  DeleteLeagueMemberRequestSchema,
-} from './LeagueMember'
+  CreateTeamRequestSchema,
+  ListTeamResponseSchema,
+  ListTeamRequestSchema,
+  TeamSchema,
+  UpdateTeamRequestSchema,
+} from './Team'
 
 // Requests
 export type CreateLeagueRequest = z.infer<typeof CreateLeagueRequestSchema>
 export type ListLeaguesRequest = z.infer<typeof ListLeaguesRequestSchema>
 export type UpdateLeagueRequest = z.infer<typeof UpdateLeagueRequestSchema>
-export type CreateLeagueMemberRequest = z.infer<typeof CreateLeagueMemberRequestSchema>
-export type ListLeagueMemberRequest = z.infer<typeof ListLeagueMemberRequestSchema>
-export type DeleteLeagueMemberRequest = z.infer<typeof DeleteLeagueMemberRequestSchema>
+export type CreateTeamRequest = z.infer<typeof CreateTeamRequestSchema>
+export type UpdateTeamRequest = z.infer<typeof UpdateTeamRequestSchema>
+export type ListTeamRequest = z.infer<typeof ListTeamRequestSchema>
 
 // Responses
 export type ListLeaguesResponse = z.infer<typeof ListLeaguesResponseSchema>
-export type ListLeagueMemberResponse = z.infer<typeof ListLeagueMemberResponseSchema>
+export type ListTeamResponse = z.infer<typeof ListTeamResponseSchema>
 
 // Data Models
 export type LeagueDto = z.infer<typeof LeagueSchema>
 export const LeagueStatusValues = LeagueStatusSchema.Enum
 export const LeagueStatusAllValues = LeagueStatusSchema.options
-export type LeagueMemberDto = z.infer<typeof LeagueMemberSchema>
+export type TeamDto = z.infer<typeof TeamSchema>

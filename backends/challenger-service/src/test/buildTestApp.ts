@@ -4,11 +4,11 @@ import { Test } from '@nestjs/testing'
 import { AuthModule, SuperTokensExceptionFilter } from 'src/auth'
 import { config } from 'src/config'
 import { LeagueModule } from 'src/domain/league'
-import { LeagueMemberModule } from 'src/domain/leagueMember'
+import { TeamModule } from 'src/domain/team'
 
 export const buildTestApp = async (): Promise<INestApplication> => {
   const moduleRef = await Test.createTestingModule({
-    imports: [LeagueModule, LeagueMemberModule, AuthModule.forRoot(config.auth)],
+    imports: [LeagueModule, TeamModule, AuthModule.forRoot(config.auth)],
   }).compile()
   const app = moduleRef.createNestApplication()
   NestAppBuilder.configureApp(app)
