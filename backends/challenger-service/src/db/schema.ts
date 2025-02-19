@@ -18,7 +18,7 @@ export const leagueTable = pgTable(
 )
 
 export const leagueRelations = relations(leagueTable, ({ many }) => ({
-  members: many(teamTable),
+  teams: many(teamTable),
 }))
 
 // 'AcceptingUsers', 'Started'

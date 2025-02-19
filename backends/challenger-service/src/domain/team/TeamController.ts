@@ -113,7 +113,7 @@ export class TeamController extends BaseController {
     const isLeagueAdmin = league.adminUserId === userIdPerformingAction
     const isActingOnSelf = team.userId === userIdPerformingAction
     if (!isLeagueAdmin && !isActingOnSelf) {
-      throw new ForbiddenError('Forbidden as non-admin members cannot modify any other members but yourself.')
+      throw new ForbiddenError('Forbidden as only league admins and the team owners themselves can modfy teams.')
     }
     return team
   }
