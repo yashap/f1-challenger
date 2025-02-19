@@ -6,7 +6,7 @@ import {
   ListTeamRequestSchema,
   ListTeamResponseSchema,
   TeamSchema,
-  DeleteTeamRequestSchema,
+  UpdateTeamRequestSchema,
 } from '../model/Team'
 
 const c = initContract()
@@ -35,11 +35,24 @@ export const teamContract = c.router({
     responses: ContractBuilder.buildGetResponses(TeamSchema),
     summary: 'Get teams',
   },
+  patch: {
+    method: 'PATCH',
+    path: '/teams/:id',
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
+    body: UpdateTeamRequestSchema,
+    responses: ContractBuilder.buildPatchResponses(TeamSchema),
+    summary: 'Update a team',
+  },
   delete: {
     method: 'DELETE',
-    path: '/teams',
-    body: DeleteTeamRequestSchema,
+    path: '/teams/:id',
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
+    body: z.NEVER,
     responses: ContractBuilder.buildDeleteResponses(),
-    summary: 'Delete team',
+    summary: 'Delete a team',
   },
 })

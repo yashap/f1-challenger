@@ -73,7 +73,7 @@ export class LeagueController extends BaseController {
   @UseGuards(new AuthGuard())
   public update(@Session() session: SessionContainer): HandlerResult<typeof contract.patch> {
     return handler(contract.patch, async ({ params: { id }, body }) => {
-      const initialLeague = await this.getAndVerifyOwnership(id, session.getUserId())
+      const initialLeague = await this.getAndVerifyCanModify(id, session.getUserId())
       if (isEmpty(body)) {
         return { status: HttpStatus.OK, body: leagueToDto(initialLeague) }
       }
@@ -90,18 +90,18 @@ export class LeagueController extends BaseController {
   @UseGuards(new AuthGuard())
   public delete(@Session() session: SessionContainer): HandlerResult<typeof contract.delete> {
     return handler(contract.delete, async ({ params: { id } }) => {
-      await this.getAndVerifyOwnership(id, session.getUserId())
+      await this.getAndVerifyCanModify(id, session.getUserId())
       await this.db.db().delete(leagueTable).where(eq(leagueTable.id, id))
       return { status: HttpStatus.NO_CONTENT, body: undefined }
     })
   }
 
-  private async getAndVerifyOwnership(leagueId: string, userId: string): Promise<League> {
+  private async getAndVerifyCanModify(leagueId: string, userIdPerformingAction: string): Promise<League> {
     const maybeLeague = await this.db.db().query.leagueTable.findFirst({
       where: eq(leagueTable.id, leagueId),
     })
     const league = this.getEntityOrNotFound(maybeLeague)
-    if (league.adminUserId !== userId) {
+    if (league.adminUserId !== userIdPerformingAction) {
       throw new ForbiddenError('Forbidden as you are not the admin of this league')
     }
     return league

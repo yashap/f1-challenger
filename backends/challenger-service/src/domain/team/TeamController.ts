@@ -5,6 +5,7 @@ import { BaseController, Endpoint, HandlerResult, HttpStatus, handler } from '@f
 import { buildPaginatedResponse, parsePagination } from '@f1-challenger/pagination'
 import { Controller, UseGuards } from '@nestjs/common'
 import { and, eq } from 'drizzle-orm'
+import { isEmpty } from 'lodash'
 import { SessionContainer } from 'supertokens-node/recipe/session'
 import { AuthGuard, Session } from 'src/auth'
 import { Db } from 'src/db/Db'
@@ -71,28 +72,47 @@ export class TeamController extends BaseController {
     })
   }
 
+  @Endpoint(contract.patch)
+  @UseGuards(new AuthGuard())
+  public update(@Session() session: SessionContainer): HandlerResult<typeof contract.patch> {
+    return handler(contract.patch, async ({ params: { id }, body }) => {
+      const initialTeam = await this.getAndVerifyCanModify(id, session.getUserId())
+      if (isEmpty(body)) {
+        return { status: HttpStatus.OK, body: teamToDto(initialTeam) }
+      }
+
+      await this.db.db().update(teamTable).set(body).where(eq(teamTable.id, id))
+      const team = await this.db.db().query.teamTable.findFirst({
+        where: eq(teamTable.id, id),
+      })
+      return { status: HttpStatus.OK, body: teamToDto(required(team)) }
+    })
+  }
+
   @Endpoint(contract.delete)
   @UseGuards(new AuthGuard())
   public delete(@Session() session: SessionContainer): HandlerResult<typeof contract.delete> {
-    return handler(contract.delete, async ({ body }) => {
-      const team = await this.getAndVerifyOwnership(body.leagueId, body.userId, session.getUserId())
+    return handler(contract.delete, async ({ params: { id } }) => {
+      const team = await this.getAndVerifyCanModify(id, session.getUserId())
       await this.db.db().delete(teamTable).where(eq(teamTable.id, team.id))
       return { status: HttpStatus.NO_CONTENT, body: undefined }
     })
   }
 
-  private async getAndVerifyOwnership(leagueId: string, userId: string, userPerformingAction: string): Promise<Team> {
-    const maybeLeague = await this.db.db().query.leagueTable.findFirst({
-      where: eq(leagueTable.id, leagueId),
-    })
-    const maybeTeam = await this.db.db().query.teamTable.findFirst({
-      where: and(eq(teamTable.leagueId, leagueId), eq(teamTable.userId, userId)),
-    })
-    const league = this.getEntityOrNotFound(maybeLeague)
-    const team = this.getEntityOrNotFound(maybeTeam)
-    const isAdmin = league.adminUserId === userPerformingAction
-    const isActingOnSelf = userId !== userPerformingAction
-    if (!isAdmin && !isActingOnSelf) {
+  private async getAndVerifyCanModify(teamId: string, userIdPerformingAction: string): Promise<Team> {
+    const team = this.getEntityOrNotFound(
+      await this.db.db().query.teamTable.findFirst({
+        where: eq(teamTable.id, teamId),
+      })
+    )
+    const league = this.getEntityOrNotFound(
+      await this.db.db().query.leagueTable.findFirst({
+        where: eq(leagueTable.id, team.leagueId),
+      })
+    )
+    const isLeagueAdmin = league.adminUserId === userIdPerformingAction
+    const isActingOnSelf = team.userId === userIdPerformingAction
+    if (!isLeagueAdmin && !isActingOnSelf) {
       throw new ForbiddenError('Forbidden as non-admin members cannot modify any other members but yourself.')
     }
     return team

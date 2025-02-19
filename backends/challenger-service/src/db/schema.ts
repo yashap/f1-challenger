@@ -34,6 +34,7 @@ export const teamTable = pgTable(
       .notNull()
       .references(() => leagueTable.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
     userId: uuid().notNull(),
+    name: text().notNull(),
   },
   (table) => [index('Team_leagueId_idx').on(table.leagueId), index('Team_userId_idx').on(table.userId)]
 )

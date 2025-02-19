@@ -12,7 +12,7 @@ import {
   ListTeamResponseSchema,
   ListTeamRequestSchema,
   TeamSchema,
-  DeleteTeamRequestSchema,
+  UpdateTeamRequestSchema,
 } from './Team'
 
 // Requests
@@ -20,8 +20,8 @@ export type CreateLeagueRequest = z.infer<typeof CreateLeagueRequestSchema>
 export type ListLeaguesRequest = z.infer<typeof ListLeaguesRequestSchema>
 export type UpdateLeagueRequest = z.infer<typeof UpdateLeagueRequestSchema>
 export type CreateTeamRequest = z.infer<typeof CreateTeamRequestSchema>
+export type UpdateTeamRequest = z.infer<typeof UpdateTeamRequestSchema>
 export type ListTeamRequest = z.infer<typeof ListTeamRequestSchema>
-export type DeleteTeamRequest = z.infer<typeof DeleteTeamRequestSchema>
 
 // Responses
 export type ListLeaguesResponse = z.infer<typeof ListLeaguesResponseSchema>

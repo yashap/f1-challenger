@@ -23,7 +23,6 @@ import {
   ListTeamRequest,
   ListTeamResponse,
   TeamDto,
-  DeleteTeamRequest,
 } from './model/types'
 
 export class ChallengerClient {
@@ -70,8 +69,8 @@ export class ChallengerClient {
     get: (id: string): Promise<TeamDto | undefined> => {
       return extractGetByIdResponse(this.client.teams.get({ params: { id } }))
     },
-    delete: (request: DeleteTeamRequest): Promise<void> => {
-      return extractDeleteResponse(this.client.teams.delete({ body: request }))
+    delete: (id: string): Promise<void> => {
+      return extractDeleteResponse(this.client.teams.delete({ params: { id } }))
     },
   }
 }
