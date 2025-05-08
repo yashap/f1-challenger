@@ -19,10 +19,27 @@ import {
   ListLeaguesResponse,
   LeagueDto,
   UpdateLeagueRequest,
-  CreateTeamRequest,
-  ListTeamRequest,
-  ListTeamResponse,
-  TeamDto,
+  CreateLeagueMemberRequest,
+  ListLeagueMemberRequest,
+  ListLeagueMemberResponse,
+  LeagueMemberDto,
+  DeleteLeagueMemberRequest,
+  ListDriverRequest,
+  ListRaceRequest,
+  CreateDraftRequest,
+  ListDraftRequest,
+  DeleteDraftRequest,
+  CreateDraftPickRequest,
+  ListDraftPickRequest,
+  DeleteDraftPickRequest,
+  ListDriverResponse,
+  ListRaceResponse,
+  ListDraftPickResponse,
+  ListDraftResponse,
+  DriverDto,
+  RaceDto,
+  DraftDto,
+  DraftPickDto
 } from './model/types'
 
 export class ChallengerClient {
@@ -56,21 +73,78 @@ export class ChallengerClient {
       return extractDeleteResponse(this.client.leagues.delete({ params: { id } }))
     },
   }
-  public readonly teams = {
-    listPage: (request: ListTeamRequest): Promise<ListTeamResponse> => {
-      return extractListResponse(this.client.teams.list({ query: request }))
+  public readonly leagueMember = {
+    listPage: (request: ListLeagueMemberRequest): Promise<ListLeagueMemberResponse> => {
+      return extractListResponse(this.client.leagueMember.list({ query: request }))
     },
-    listAllPages: async (request: Omit<ListTeamRequest, 'cursor'>): Promise<TeamDto[]> => {
-      return fetchAllPages({ limit: DEFAULT_LIMIT, ...request }, (req) => this.teams.listPage(req))
+    listAllPages: async (request: Omit<ListLeagueMemberRequest, 'cursor'>): Promise<LeagueMemberDto[]> => {
+      return fetchAllPages({ limit: DEFAULT_LIMIT, ...request }, (req) => this.leagueMember.listPage(req))
     },
-    create: (request: CreateTeamRequest): Promise<TeamDto> => {
-      return extractPostResponse(this.client.teams.post({ body: request }))
+    create: (request: CreateLeagueMemberRequest): Promise<LeagueMemberDto> => {
+      return extractPostResponse(this.client.leagueMember.post({ body: request }))
     },
-    get: (id: string): Promise<TeamDto | undefined> => {
-      return extractGetByIdResponse(this.client.teams.get({ params: { id } }))
+    get: (id: string): Promise<LeagueMemberDto | undefined> => {
+      return extractGetByIdResponse(this.client.leagueMember.get({ params: { id } }))
     },
-    delete: (id: string): Promise<void> => {
-      return extractDeleteResponse(this.client.teams.delete({ params: { id } }))
+    delete: (request: DeleteLeagueMemberRequest): Promise<void> => {
+      return extractDeleteResponse(this.client.leagueMember.delete({ body: request }))
+    },
+  }
+  public readonly draft = {
+    listPage: (request: ListDraftRequest): Promise<ListDraftResponse> => {
+      return extractListResponse(this.client.draft.list({ query: request }))
+    },
+    listAllPages: async (request: Omit<ListDraftRequest, 'cursor'>): Promise<DraftDto[]> => {
+      return fetchAllPages({ limit: DEFAULT_LIMIT, ...request }, (req) => this.race.listPage(req))
+    },
+    create: (request: CreateDraftRequest): Promise<DraftDto> => {
+      return extractPostResponse(this.client.draft.post({ body: request }))
+    },
+    get: (id: string): Promise<DraftDto | undefined> => {
+      return extractGetByIdResponse(this.client.draft.get({ params: { id } }))
+    },
+    delete: (request: DeleteDraftRequest): Promise<void> => {
+      return extractDeleteResponse(this.client.draft.delete({ body: request }))
+    },
+  }
+  public readonly draftPick = {
+    listPage: (request: ListDraftPickRequest): Promise<ListDraftPickResponse> => {
+      return extractListResponse(this.client.draftPick.list({ query: request }))
+    },
+    listAllPages: async (request: Omit<ListDraftPickRequest, 'cursor'>): Promise<DraftPickDto[]> => {
+      return fetchAllPages({ limit: DEFAULT_LIMIT, ...request }, (req) => this.draftPick.listPage(req))
+    },
+    create: (request: CreateDraftPickRequest): Promise<DraftPickDto> => {
+      return extractPostResponse(this.client.draftPick.post({ body: request }))
+    },
+    get: (id: string): Promise<DraftPickDto | undefined> => {
+      return extractGetByIdResponse(this.client.draftPick.get({ params: { id } }))
+    },
+    delete: (request: DeleteDraftPickRequest): Promise<void> => {
+      return extractDeleteResponse(this.client.draftPick.delete({ body: request }))
+    },
+  }
+  public readonly driver = {
+    listPage: (request: ListDriverRequest): Promise<ListDriverResponse> => {
+      return extractListResponse(this.client.driver.list({ query: request }))
+    },
+    listAllPages: async (request: Omit<ListDriverRequest, 'cursor'>): Promise<DriverDto[]> => {
+      return fetchAllPages({ limit: DEFAULT_LIMIT, ...request }, (req) => this.driver.listPage(req))
+    },
+    get: (id: string): Promise<DriverDto | undefined> => {
+      return extractGetByIdResponse(this.client.driver.get({ params: { id } }))
+    },
+  }
+  public readonly race = {
+    listPage: (request: ListRaceRequest): Promise<ListRaceResponse> => {
+      return extractListResponse(this.client.race.list({ query: request }))
+    },
+    listAllPages: async (request: Omit<ListRaceRequest, 'cursor'>): Promise<RaceDto[]> => {
+      return fetchAllPages({ limit: DEFAULT_LIMIT, ...request }, (req) => this.race.listPage(req))
+    },
+    get: (id: string): Promise<RaceDto | undefined> => {
+      return extractGetByIdResponse(this.client.race.get({ params: { id } }))
     },
   }
 }
+
